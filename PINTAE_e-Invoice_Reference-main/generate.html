@@ -419,14 +419,16 @@ input::placeholder{color:var(--text3)}
 
 <script>
 // ── Valid VAT rules per doc type ─────────────────────────────────────────────
-// 480/81 = Commercial Invoice/CN: only O/E/Z/AE (no S, no N per schematron ibr-122-ae)
+// ibr-151-ae (380/381): at least one line must not be E or O — AE, Z, S all satisfy this
+// ibr-122-ae (480/81):  only E, O, Z allowed
+// ibr-116-ae (all):     Margin scheme → only N
 const DOC_VAT = {
-  "380": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.includes("S"), hint: "Must include S, or use N alone (Margin scheme)" },
-  "381": { allowed: ["S","E","Z","O","AE"],     validate: c => c.includes("S"),    hint: "Must include S (Tax Credit Note)" },
-  "480": { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "Commercial Invoice: O, E or Z only (no S, AE or N)" },
-  "81":  { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "Commercial Credit Note: O, E or Z only" },
-  "389": { allowed: ["S","E","Z","AE","N"],     validate: c => c.includes("N") ? c.length===1 : c.includes("S"), hint: "Must include S, or use N alone (Margin scheme)" },
-  "261": { allowed: ["S","E","Z","AE"],         validate: c => c.includes("S"),    hint: "Must include S (Self-Billing Credit Note)" },
+  "380": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.some(cat => !["E","O"].includes(cat)), hint: "ibr-151-ae: at least one category must not be E or O (S, AE or Z satisfy this); or N alone for Margin scheme" },
+  "381": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.some(cat => !["E","O"].includes(cat)), hint: "ibr-151-ae: at least one category must not be E or O (S, AE or Z satisfy this); or N alone for Margin scheme" },
+  "480": { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "ibr-122-ae: Commercial Invoice allows O, E or Z only (no S, AE or N)" },
+  "81":  { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "ibr-122-ae: Commercial Credit Note allows O, E or Z only (no S, AE or N)" },
+  "389": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.length > 0, hint: "Select a VAT category; N only for Margin scheme" },
+  "261": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.length > 0, hint: "Select a VAT category; N only for Margin scheme" },
 };
 
 // ── Transaction type constraints ─────────────────────────────────────────────
@@ -489,8 +491,8 @@ function updateVatChips() {
     const inp = chip.querySelector("input");
 
     const allowedByDoc = rule.allowed.includes(cat);
-    // For Margin, only N is allowed
-    const allowedByTx = !txc || (txc.required === cat);
+    // Margin: only N allowed; non-Margin: N not allowed (ibr-116-ae)
+    const allowedByTx = tx === "Margin" ? cat === "N" : cat !== "N";
 
     if (!allowedByDoc || !allowedByTx) {
       chip.classList.add("disabled");
