@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NEG-062: Two Invoice elements inside a wrapper root — not a valid UBL document -->
+<InvoiceCollection xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+                   xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+    <cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+    <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+    <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
+    <cbc:ID>INV-2025-NEG-062-A</cbc:ID>
+    <cbc:IssueDate>2025-06-01</cbc:IssueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+  </Invoice>
+  <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+    <cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+    <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+    <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
+    <cbc:ID>INV-2025-NEG-062-B</cbc:ID>
+    <cbc:IssueDate>2025-06-01</cbc:IssueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+  </Invoice>
+</InvoiceCollection>

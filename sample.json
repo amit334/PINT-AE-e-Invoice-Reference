@@ -1,0 +1,271 @@
+{
+    "issue_date": "2025-02-06",
+    "invoice_type_code": "380",
+    "invoice_currency_code": "AED",
+    "tax_currency_code": null,
+    "vat_point_date": "2025-01-30",
+    "payment_due_date": "2025-02-13",
+    "buyer_reference": "PO-AE-220",
+    "project_reference": "عمل اعتيادي",
+    "contract_document_reference": null,
+    "purchase_order_reference": "PO-AE-220",
+    "sales_order_reference": "Salesorder-2122",
+    "receipt_document_reference": null,
+    "despatch_document_reference": "Memo-1000",
+    "originator_document_reference": "PO-AE-220",
+    "additional_document_reference_id": "PO-AE-220",
+    "additional_document_reference_id_scheme": null,
+    "buyer_accounting_reference": "مبيعات عادية",
+    "invoice_note": "فاتورة ضريبية",
+    "issue_time": "07:54:00",
+    "transaction_type_code": "00000000",
+    "discrepancy_response_code": null,
+    "currency_exchange_rate": null,
+    "contract_value": null,
+    "principal_identifier": null,
+    "customs_reference_number": null,
+    "process_control": {
+        "profile_id": "urn:peppol:bis:billing",
+        "customization_id": "urn:peppol:pint:billing-1@ae-1"
+    },
+    "seller": {
+        "name": "الاسم القانوني للمورد",
+        "trading_name": "الاسم التجاري للطرف",
+        "legal_registration_identifier": "112345678900003",
+        "legal_registration_identifier_scheme": "0234",
+        "vat_identifier": "198765432102003",
+        "tax_scheme": "VAT",
+        "tax_registration_identifier": null,
+        "tax_registration_tax_scheme": null,
+        "additional_legal_information": "تاجر",
+        "electronic_address": "1434553326",
+        "electronic_address_scheme": "0235",
+        "address_line_1": "اسم الشارع",
+        "address_line_2": null,
+        "address_line_3": null,
+        "city": "الشارقة",
+        "post_code": null,
+        "country_subdivision": "SHJ",
+        "country_code": "AE",
+        "contact_point": "اسم جهة الاتصال",
+        "contact_telephone_number": "رقم الهاتف",
+        "contact_email_address": "البريد الإلكتروني",
+        "authority_name": "جهة إصدار الرخصة التجارية",
+        "legal_registration_identifier_type": "TL",
+        "passport_issuing_country_code": null,
+        "identifiers": []
+    },
+    "buyer": {
+        "name": "نور للإلكترونيات",
+        "trading_name": "الاسم التجاري للمشتري",
+        "identifier": null,
+        "identifier_scheme": null,
+        "legal_registration_identifier": "112345679000001",
+        "legal_registration_identifier_scheme": "0234",
+        "vat_identifier": "134567890123003",
+        "tax_scheme": "VAT",
+        "electronic_address": "1434553326",
+        "electronic_address_scheme": "0235",
+        "address_line_1": "اسم الشارع",
+        "address_line_2": null,
+        "address_line_3": null,
+        "city": "أبو ظبي",
+        "post_code": null,
+        "country_subdivision": "AUH",
+        "country_code": "AE",
+        "contact_point": "اسم جهة الاتصال",
+        "contact_telephone_number": "رقم الهاتف",
+        "contact_email_address": "البريد الإلكتروني",
+        "beneficiary_identifier": null,
+        "authority_name": "جهة إصدار الرخصة التجارية",
+        "legal_registration_identifier_type": "TL",
+        "passport_issuing_country_code": null
+    },
+    "payee": {
+        "name": "اسم المستفيد",
+        "identifier": "1122334455",
+        "identifier_scheme": null,
+        "legal_registration_identifier": "1122334455",
+        "legal_registration_identifier_scheme": null
+    },
+    "seller_tax_representative": null,
+    "delivery": null,
+    "totals": {
+        "sum_of_invoice_line_net_amount": "10486.00",
+        "sum_of_allowances_on_document_level": "262.15",
+        "sum_of_charges_on_document_level": "419.44",
+        "invoice_total_amount_without_vat": "10643.29",
+        "invoice_total_vat_amount": "532.16",
+        "invoice_total_vat_amount_in_accounting_currency": "532.16",
+        "invoice_total_amount_with_vat": "11175.45",
+        "paid_amount": "0.00",
+        "rounding_amount": "0.05",
+        "amount_due_for_payment": "11175.50",
+        "invoice_total_amount_with_vat_in_aed": "11175.45",
+        "tax_included_indicator": false
+    },
+    "preceding_invoice_references": [
+		{
+			"preceding_invoice_reference": "INV-234-2025",
+			"preceding_invoice_issue_date": "2025-02-06"
+		}
+	],
+    "allowances": [
+        {
+            "amount": "262.15",
+            "base_amount": "10486.00",
+            "percentage": "2.50",
+            "vat_category_code": "S",
+            "tax_scheme_code": "VAT",
+            "vat_rate": "5.00",
+            "reason": "خصم خاص",
+            "reason_code": "100",
+            "vat_exemption_reason_code": null,
+            "vat_exemption_reason_text": null
+        }
+    ],
+    "charges": [
+        {
+            "amount": "419.44",
+            "base_amount": "10486.00",
+            "percentage": "4.00",
+            "vat_category_code": "S",
+            "tax_scheme_code": "VAT",
+            "vat_rate": "5.00",
+            "reason": "تسليم عاجل",
+            "reason_code": "AAT",
+            "vat_exemption_reason_code": null,
+            "vat_exemption_reason_text": null
+        }
+    ],
+    "vat_breakdowns": [
+        {
+            "taxable_amount": "10643.29",
+            "tax_amount": "532.16",
+            "vat_category_code": "S",
+            "tax_scheme_code": "VAT",
+            "vat_category_rate": "5.00"
+        }
+    ],
+    "supporting_documents": [
+        {
+            "reference": "PO-AE-220",
+            "description": null,
+            "external_document_location": "https://www.site.ae/PO-AE-220.pdf",
+            "attached_document": null,
+            "attached_document_mime_code": null,
+            "attached_document_filename": null,
+            "attached_document_s3_path": null
+        },
+        {
+            "reference": "PO-AE-220",
+            "description": null,
+            "external_document_location": null,
+            "attached_document": "UW1GelpUWTBJR052Ym5SbGJuUWdaWGhoYlhCZlpRPT0=",
+            "attached_document_mime_code": "application/pdf",
+            "attached_document_filename": "PO-AE-220.pdf",
+            "attached_document_s3_path": null
+        }
+    ],
+    "payment_instructions": [
+        {
+            "payment_means_type_code": "55",
+            "payment_means_text": "بطاقة الخصم",
+            "payment_instructions_id": null,
+            "payment_account_identifier": null,
+            "payment_account_identifier_scheme": null,
+            "payment_account_name": null,
+            "payment_service_provider_identifier": null,
+            "payment_card_primary_account_number": "XXXXXXXXXXXX1234",
+            "payment_card_holder_name": "اسم حامل البطاقة",
+            "mandate_reference_identifier": null,
+            "bank_assigned_creditor_identifier": null,
+            "debited_account_identifier": null,
+            "account_address_line_1": null,
+            "account_address_line_2": null,
+            "account_address_line_3": null,
+            "account_city": null,
+            "account_post_code": null,
+            "account_country_subdivision": null,
+            "account_country_code": null,
+            "remittance_information": []
+        }
+    ],
+    "terms": [
+        {
+            "payment_terms": "خلال أسبوع",
+            "terms_amount": null,
+            "terms_installment_due_date": "2025-02-13",
+            "terms_payment_instructions_id": null
+        }
+    ],
+    "lines": [
+        {
+            "line_id": "1",
+            "note": "جميع العناصر",
+            "object_identifier": null,
+            "object_identifier_scheme": null,
+            "invoiced_quantity": "2000.000000",
+            "invoiced_quantity_unit_of_measure_code": "H87",
+            "line_net_amount": "10486.00",
+            "purchase_order_line_reference": "1",
+            "buyer_accounting_reference": null,
+            "purchase_order_reference": "PO-AE-220",
+            "despatch_advice_reference": null,
+            "batch_number": null,
+            "line_period_start_date": "2025-01-31",
+            "line_period_end_date": "2025-01-31",
+            "item_net_price": "4.900000",
+            "item_price_discount": "0.100000",
+            "item_gross_price": "5.000000",
+            "item_price_base_quantity": "1.000000",
+            "item_price_base_quantity_unit_of_measure_code": "H87",
+            "item_name": "اسم الصنف",
+            "item_description": "وصف الصنف",
+            "item_sellers_identifier": "سلع مباعة",
+            "item_buyers_identifier": "سلع مشتراة",
+            "item_standard_identifier": null,
+            "item_standard_identifier_scheme": null,
+            "item_country_of_origin": "AE",
+            "item_type": null,
+            "type_of_goods_or_services": null,
+            "line_amount_in_aed": "11010.30",
+            "vat_line_amount_in_aed": "524.30",
+            "allowances": [
+                {
+                    "amount": "294.00",
+                    "base_amount": "9800.00",
+                    "percentage": "3.00",
+                    "reason": "خصم",
+                    "reason_code": "95"
+                }
+            ],
+            "charges": [
+                {
+                    "amount": "980.00",
+                    "base_amount": "9800.00",
+                    "percentage": "10.00",
+                    "reason": "تعديل فني",
+                    "reason_code": "AAC"
+                }
+            ],
+            "vat_info": [
+                {
+                    "vat_category_code": "S",
+                    "vat_rate": "5.00",
+                    "tax_scheme": "VAT",
+                    "vat_exemption_reason_text": null,
+                    "vat_exemption_reason_code": null
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "تفاصيل الصنف",
+                    "value": "قيمة الصنف"
+                }
+            ],
+            "classifications": [],
+            "service_accounting_codes": []
+        }
+    ]
+}

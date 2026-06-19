@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE 1.0.4 — All Fields with Enumerated Values</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14; --surface: #161920; --surface2: #1e2230;
+  --border: #2a2f3d; --border2: #363c50;
+  --text: #e8ecf4; --text2: #8892a8; --text3: #545e74;
+  --accent: #4e9cf5; --green: #3ecf8e; --amber: #f5a623; --red: #f55a5a;
+  --purple: #a78bfa; --teal: #2dd4bf;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(78,156,245,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78,156,245,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Top bar ── */
+.topbar {
+  position: relative;
+  z-index: 10;
+  padding: 1rem 2rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text2); text-decoration: none;
+  padding: 5px 10px; border: 1px solid var(--border2); border-radius: 5px;
+  transition: all 0.15s; font-family: 'IBM Plex Mono', monospace;
+}
+.back-btn:hover { color: var(--text); border-color: var(--accent); }
+.page-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.page-sub { font-size: 11px; color: var(--text2); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+.topbar-badge {
+  font-size: 10px; font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+  padding: 3px 9px; border-radius: 10px;
+  background: rgba(78,156,245,0.1); color: var(--accent);
+  border: 1px solid rgba(78,156,245,0.25);
+}
+
+/* ── Content area ── */
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 1.75rem 2rem 4rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── Search / sticky bar ── */
+.search-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+.search-bar input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  padding: .55rem .85rem;
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-bar input::placeholder { color: var(--text3); }
+.search-bar input:focus { border-color: var(--accent); }
+
+/* ── Legend ── */
+.legend {
+  display: flex; gap: 14px;
+  padding: .6rem .85rem;
+  font-size: 11px; color: var(--text2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  align-items: center;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-note { color: var(--text3); font-style: italic; margin-left: auto; font-size: 10px; }
+
+/* ── Group / row layout ── */
+.group {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.gh {
+  display: flex; align-items: center; gap: 8px;
+  padding: .7rem 1rem;
+  background: var(--surface2);
+  cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.gh:hover { background: var(--surface); }
+.gh h3 { margin: 0; font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
+.gh .cnt {
+  font-size: 10px; padding: 2px 8px; border-radius: 999px;
+  background: rgba(78,156,245,0.1); color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.gh .chv { font-size: 14px; color: var(--text3); transition: transform .2s; }
+.gh.open .chv { transform: rotate(180deg); }
+.gb { display: none; } .gb.open { display: block; }
+
+.row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  border-top: 1px solid var(--border);
+}
+.row:first-child { border-top: none; }
+
+.rl {
+  padding: .6rem .9rem;
+  font-size: 12px; font-weight: 500;
+  color: var(--text2);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.rl .field-name { font-size: 12px; font-weight: 500; color: var(--text); }
+.rl .ibt {
+  font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+}
+.rl .rule { font-size: 10px; color: var(--amber); font-style: italic; }
+
+.rr { padding: .6rem .9rem; display: flex; flex-wrap: wrap; gap: 5px; align-items: flex-start; }
+
+.pill {
+  font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+  padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  background: var(--surface2);
+}
+.pill.hi  { background: rgba(78,156,245,0.12); color: var(--accent); border-color: rgba(78,156,245,0.3); }
+.pill.sb  { background: rgba(62,207,142,0.12); color: var(--green); border-color: rgba(62,207,142,0.3); }
+.pill.warn{ background: rgba(245,166,35,0.12); color: var(--amber); border-color: rgba(245,166,35,0.3); }
+
+.note {
+  font-size: 11px; color: var(--text3);
+  padding: .4rem .9rem .55rem;
+  grid-column: 1 / -1;
+  border-top: 1px dashed var(--border);
+  background: var(--bg);
+  line-height: 1.55;
+}
+.note-icon { color: var(--amber); margin-right: 4px; }
+
+.none { padding: 2.5rem; text-align: center; color: var(--text3); font-size: 13px; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn">← Back</a>
+    <div>
+      <div class="page-title">All Fields with Enumerated Values</div>
+      <div class="page-sub">PINT AE 1.0.4 — verified from schematron test expressions</div>
+    </div>
+  </div>
+  <span class="topbar-badge">14 groups</span>
+</div>
+
+<div class="content">
+
+  <div class="search-bar">
+    <input type="text" id="q" placeholder="Search fields, codes, IBT numbers or rule IDs…" oninput="filter()"/>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item"><span class="pill hi" style="font-family:'IBM Plex Sans',sans-serif">Blue</span> Billing spec value</span>
+    <span class="legend-item"><span class="pill sb" style="font-family:'IBM Plex Sans',sans-serif">Green</span> Self-billing only / different value</span>
+    <span class="legend-item"><span class="pill warn" style="font-family:'IBM Plex Sans',sans-serif">Amber</span> Note / constraint</span>
+    <span class="legend-note">Source: schematron test expressions, not HTML code list pages</span>
+  </div>
+
+  <div id="cont"></div>
+  <div class="none hidden" id="none">No matching fields.</div>
+
+</div>
+
+<script>
+const D=[
+{
+  g:"1 — Document type codes (IBT-003)",
+  rows:[
+    {
+      l:"Invoice type code",ibt:"IBT-003 / cbc:InvoiceTypeCode",rule:"ibr-cl-01 (Billing)",
+      note:"Billing schematron test: contains(' 380 480 ', ...) — ONLY these two values are valid for cbc:InvoiceTypeCode in the Billing spec",
+      pills:[{t:"380",hi:true},{t:"480",hi:true},{t:"380 — Commercial invoice"},{t:"480 — Self-billing invoice (within Billing spec)"}]
+    },
+    {
+      l:"Credit note type code",ibt:"IBT-003 / cbc:CreditNoteTypeCode",rule:"ibr-cl-01 (Billing)",
+      note:"Billing schematron test: contains(' 81 381 ', ...) — ONLY these two values are valid for cbc:CreditNoteTypeCode in the Billing spec",
+      pills:[{t:"381",hi:true},{t:"81",hi:true},{t:"381 — Credit note"},{t:"81 — Credit note related to goods or services"}]
+    },
+    {
+      l:"Invoice type code",ibt:"IBT-003 / cbc:InvoiceTypeCode",rule:"ibr-cl-01 (Self-Billing)",
+      note:"Self-billing schematron test: contains(' 389 480 ', ...) — ONLY these two values are valid in the Self-Billing spec",
+      pills:[{t:"389",sb:true},{t:"480",sb:true},{t:"389 — Self-billed invoice"},{t:"480 — Self-billing invoice"}]
+    },
+    {
+      l:"Credit note type code",ibt:"IBT-003 / cbc:CreditNoteTypeCode",rule:"ibr-cl-01 (Self-Billing)",
+      note:"Self-billing schematron test: contains(' 261 81 ', ...) — ONLY these two values are valid in the Self-Billing spec",
+      pills:[{t:"261",sb:true},{t:"81",sb:true},{t:"261 — Self-billed credit note"},{t:"81 — Credit note related to goods or services"}]
+    },
+  ]
+},
+{
+  g:"2 — Process & specification identifiers",
+  rows:[
+    {
+      l:"Customization ID",ibt:"IBT-024 / cbc:CustomizationID",rule:"aligned-ibrp-001-ae",
+      note:"Test: starts-with(..., 'urn:peppol:pint:billing-1@ae-1') OR starts-with(..., 'urn:peppol:pint:selfbilling-1@ae-1'). Must START WITH these values.",
+      pills:[{t:"urn:peppol:pint:billing-1@ae-1",hi:true},{t:"urn:peppol:pint:selfbilling-1@ae-1",sb:true}]
+    },
+    {
+      l:"Business process (Profile ID)",ibt:"IBT-023 / cbc:ProfileID",rule:"aligned-ibrp-002-ae",
+      note:"Test: matches(..., '^urn:peppol:bis:billing') OR matches(..., '^urn:peppol:bis:selfbilling'). Must start with these.",
+      pills:[{t:"urn:peppol:bis:billing",hi:true},{t:"urn:peppol:bis:selfbilling",sb:true}]
+    },
+    {
+      l:"Transaction type code",ibt:"BTAE-02 / cbc:ProfileExecutionID",rule:"ibr-154-ae",
+      note:"Test: matches(cbc:ProfileExecutionID, '^[01]{8}$') — exactly 8 characters, each must be 0 or 1. Positions: 1=FTZ, 2=Deemed supply, 3=Margin scheme, 4=Summary, 5=reserved, 6=Disclosed agent, 7=E-commerce, 8=Exports",
+      pills:[{t:"00000000",hi:true},{t:"Pattern: [01]{8}"},{t:"e.g. 10000000 = FTZ"},{t:"e.g. 00000001 = Exports"},{t:"e.g. 00010000 = Summary invoice"},{t:"Multiple bits can be 1"}]
+    },
+  ]
+},
+{
+  g:"3 — VAT category codes",
+  rows:[
+    {
+      l:"VAT category code",ibt:"IBT-151/118/095/102 (cac:TaxCategory/cbc:ID, cac:ClassifiedTaxCategory/cbc:ID)",rule:"ibr-139-ae",
+      note:"Schematron test: contains(' S E O AE Z N ', ...) — these are the ONLY 6 valid values across both specs. Note: 'SA' (Standard rate additional VAT) appears in business rule descriptions but the schematron test for ibr-139-ae only lists these 6.",
+      pills:[{t:"S",hi:true},{t:"E",hi:true},{t:"O",hi:true},{t:"AE",hi:true},{t:"Z",hi:true},{t:"N",hi:true},{t:"S — Standard rated"},{t:"E — Exempt from VAT"},{t:"O — Not subject to VAT"},{t:"AE — VAT reverse charge"},{t:"Z — Zero rated"},{t:"N — (additional)"}]
+    },
+    {
+      l:"VAT rate — Standard (S)",ibt:"IBT-152/119/096/103",rule:"ibr-190-ae",
+      note:"Schematron test: every TaxCategory[ID='S']/Percent must castable as decimal AND equal 5.00. Exactly 5.00, no other value.",
+      pills:[{t:"5.00",hi:true}]
+    },
+    {
+      l:"VAT rate — Zero rated (Z)",ibt:"IBT-152/119/096/103",rule:"ibr-120-ae",
+      note:"In VAT breakdown where category = Z, rate SHALL equal 0",
+      pills:[{t:"0",hi:true}]
+    },
+    {
+      l:"VAT rate — Exempt (E)",ibt:"IBT-119",rule:"ibr-121-ae",
+      note:"In VAT breakdown where category = E, rate SHALL NOT be provided",
+      pills:[{t:"(absent)",warn:true}]
+    },
+    {
+      l:"VAT rate — Not subject (O)",ibt:"IBT-119",rule:"ibr-o-11-ae",
+      note:"In VAT breakdown where category = O, rate SHALL NOT be provided",
+      pills:[{t:"(absent)",warn:true}]
+    },
+    {
+      l:"Tax scheme ID",ibt:"cac:TaxScheme/cbc:ID",rule:"ibr-133-ae",
+      note:"Test: TaxScheme ID shall be 'VAT' EXCEPT when IBT-032 (Seller tax registration/TIN) is provided — in that case scheme shall NOT be 'VAT'",
+      pills:[{t:"VAT",hi:true},{t:"(not VAT when IBT-032 used)",warn:true}]
+    },
+    {
+      l:"Tax accounting currency",ibt:"IBT-006 / cbc:TaxCurrencyCode",rule:"ibr-140-ae",
+      note:"Test: when IBT-006 is present, it SHALL be 'AED'. Fixed value.",
+      pills:[{t:"AED",hi:true}]
+    },
+  ]
+},
+{
+  g:"4 — VAT exemption reason codes",
+  rows:[
+    {
+      l:"VAT exemption reason code",ibt:"IBT-186 / cbc:TaxExemptionReasonCode",rule:"ibr-167-ae (presence) — no value enumeration schematron found",
+      note:"ibr-167-ae only validates PRESENCE of the code when category=E, not its value. The code list page shows DL8.46.x codes (UAE Decree-Law Art 46) but no schematron value test was found for them. Use the official code list.",
+      pills:[{t:"DL8.46.1",hi:true},{t:"DL8.46.2",hi:true},{t:"DL8.46.3",hi:true},{t:"DL8.46.4",hi:true},{t:"DL8.46.5",hi:true},{t:"DL8.46.1 — Certain financial services"},{t:"DL8.46.2 — Life insurance/reinsurance"},{t:"DL8.46.3 — Residential real estate"},{t:"DL8.46.4 — Bare land"},{t:"DL8.46.5 — Local passenger transport"}]
+    },
+  ]
+},
+{
+  g:"5 — Credit note reason codes (BTAE-03)",
+  rows:[
+    {
+      l:"Credit note reason code",ibt:"BTAE-03 / cbc:ResponseCode",rule:"ibr-001-ae",
+      note:"Schematron test: contains(' DL8.61.1.A DL8.61.1.B DL8.61.1.C DL8.61.1.D DL8.61.1.E VD ', ...) — exactly 6 values. Note: previous answer missed DL8.61.1.E.",
+      pills:[{t:"DL8.61.1.A",hi:true},{t:"DL8.61.1.B",hi:true},{t:"DL8.61.1.C",hi:true},{t:"DL8.61.1.D",hi:true},{t:"DL8.61.1.E",hi:true},{t:"VD",hi:true},{t:"DL8.61.1.A — Supply cancelled"},{t:"DL8.61.1.B — Nature of supply changed"},{t:"DL8.61.1.C — Consideration changed"},{t:"DL8.61.1.D — Goods returned"},{t:"DL8.61.1.E — (Art 61.1.E)"},{t:"VD — Voucher/discount (no preceding invoice needed)"}]
+    },
+  ]
+},
+{
+  g:"6 — RCM / Goods type codes (BTAE-09)",
+  rows:[
+    {
+      l:"Type of goods/services (RCM)",ibt:"BTAE-09 / cbc:NatureCode",rule:"ibr-006-ae",
+      note:"Schematron test: contains(' DL8.48.8.2 DL8.48.8.1 DL8.48.3.1 DL8.48.3.2 DL8.48.3.3 ', ...) — exactly 5 values. Previous answers only showed 1.",
+      pills:[{t:"DL8.48.8.2",hi:true},{t:"DL8.48.8.1",hi:true},{t:"DL8.48.3.1",hi:true},{t:"DL8.48.3.2",hi:true},{t:"DL8.48.3.3",hi:true},{t:"DL8.48.8.2 — Electronic devices"},{t:"DL8.48.8.1 — Mobile phones"},{t:"DL8.48.3.1 — Gold (non-investment)"},{t:"DL8.48.3.2 — Gold jewelry"},{t:"DL8.48.3.3 — Processed gold"}]
+    },
+  ]
+},
+{
+  g:"7 — Item type (BTAE-13)",
+  rows:[
+    {
+      l:"Item type",ibt:"BTAE-13",rule:"ibr-184-ae / ibr-185-ae / ibr-186-ae",
+      note:"Drives whether HS code or SAC code is required. Values from schemeAgencyID usage in rules.",
+      pills:[{t:"G",hi:true},{t:"S",hi:true},{t:"B",hi:true},{t:"G — Goods (requires HS code IBT-158)"},{t:"S — Services (requires SAC code BTAE-17)"},{t:"B — Both (requires both)"}]
+    },
+    {
+      l:"Item classification scheme (IBT-158-1)",ibt:"IBT-158-1 / @listID on cbc:ItemClassificationCode",rule:"ibr-188-ae",
+      note:"Test: scheme identifier MUST be 'HS' when item classification identifier is provided",
+      pills:[{t:"HS",hi:true}]
+    },
+    {
+      l:"Service accounting code scheme (BTAE-17-1)",ibt:"BTAE-17-1",rule:"ibr-189-ae",
+      note:"Test: scheme identifier MUST be 'SAC' when service accounting code is provided",
+      pills:[{t:"SAC",hi:true}]
+    },
+    {
+      l:"Item standard ID scheme (IBT-157-1)",ibt:"IBT-157-1",rule:"ibr-174-ae",
+      note:"For RCM items, scheme identifier MUST be '0160'",
+      pills:[{t:"0160",hi:true}]
+    },
+  ]
+},
+{
+  g:"8 — Party identifier types & schemes",
+  rows:[
+    {
+      l:"Seller legal reg. identifier type (BTAE-15)",ibt:"IBT-030-1 / cbc:CompanyID @schemeAgencyID",rule:"ibr-173-ae",
+      note:"Schematron test: schemeAgencyID = ('TL', 'EID', 'PAS', 'CD') — these are the 4 actual code values, not the display names",
+      pills:[{t:"TL",hi:true},{t:"EID",hi:true},{t:"PAS",hi:true},{t:"CD",hi:true},{t:"TL — Commercial/Trade license"},{t:"EID — Emirates ID"},{t:"PAS — Passport"},{t:"CD — Cabinet decision"}]
+    },
+    {
+      l:"Buyer legal reg. identifier type (BTAE-16)",ibt:"IBT-047-1 / cbc:CompanyID @schemeAgencyID",rule:"ibr-183-ae",
+      note:"Schematron test: schemeAgencyID = ('TL','CL','EID','PAS','CD') — note Buyer has 5 values including 'CL', Seller only has 4",
+      pills:[{t:"TL",hi:true},{t:"CL",hi:true},{t:"EID",hi:true},{t:"PAS",hi:true},{t:"CD",hi:true},{t:"TL — Trade license"},{t:"CL — Commercial license"},{t:"EID — Emirates ID"},{t:"PAS — Passport"},{t:"CD — Cabinet decision"}]
+    },
+    {
+      l:"PEPPOL UAE endpoint scheme",ibt:"IBT-034-1 / IBT-049-1",rule:"ibr-150-ae / ibr-149-ae",
+      note:"For UAE PEPPOL routing, scheme ID '0235' triggers additional validation rules",
+      pills:[{t:"0235",hi:true}]
+    },
+  ]
+},
+{
+  g:"9 — UAE address subdivision (emirate codes)",
+  rows:[
+    {
+      l:"Country subdivision",ibt:"IBT-039/054/068/079 / cbc:CountrySubentity",rule:"ibr-128-ae",
+      note:"Schematron test: CountrySubentity = ('AUH','DXB','SHJ','UAQ','FUJ','AJM','RAK') — only when country=AE. Exactly 7 valid values.",
+      pills:[{t:"AUH",hi:true},{t:"DXB",hi:true},{t:"SHJ",hi:true},{t:"UAQ",hi:true},{t:"FUJ",hi:true},{t:"AJM",hi:true},{t:"RAK",hi:true},{t:"AUH — Abu Dhabi"},{t:"DXB — Dubai"},{t:"SHJ — Sharjah"},{t:"UAQ — Umm Al Quwain"},{t:"FUJ — Fujairah"},{t:"AJM — Ajman"},{t:"RAK — Ras Al Khaimah"}]
+    },
+  ]
+},
+{
+  g:"10 — Payment means codes (IBT-081)",
+  rows:[
+    {
+      l:"Payment means type code",ibt:"IBT-081 / cbc:PaymentMeansCode",rule:"ibr-cl-16",
+      note:"Schematron test lists full UNCL4461 set: 1–98 (with gaps) plus ZZZ, Z01–Z08. All values shown here are what the test actually allows.",
+      pills:[{t:"1",hi:true},{t:"2"},{t:"3"},{t:"4"},{t:"5"},{t:"6"},{t:"7"},{t:"8"},{t:"9"},{t:"10",hi:true},{t:"11"},{t:"12"},{t:"13"},{t:"14"},{t:"15"},{t:"16"},{t:"17"},{t:"18"},{t:"19"},{t:"20",hi:true},{t:"21"},{t:"22"},{t:"23"},{t:"24"},{t:"25"},{t:"26"},{t:"27"},{t:"28"},{t:"29"},{t:"30",hi:true},{t:"31"},{t:"32"},{t:"33"},{t:"34"},{t:"35"},{t:"36"},{t:"37"},{t:"38"},{t:"39"},{t:"40"},{t:"41"},{t:"42",hi:true},{t:"43"},{t:"44"},{t:"45"},{t:"46"},{t:"47"},{t:"48",hi:true},{t:"49",hi:true},{t:"50"},{t:"51"},{t:"52"},{t:"53"},{t:"54"},{t:"55"},{t:"56"},{t:"57",hi:true},{t:"58"},{t:"59"},{t:"60"},{t:"61"},{t:"62"},{t:"63"},{t:"64"},{t:"65"},{t:"66"},{t:"67"},{t:"68"},{t:"70"},{t:"74"},{t:"75"},{t:"76"},{t:"77"},{t:"78"},{t:"91"},{t:"92"},{t:"93"},{t:"94"},{t:"95"},{t:"96"},{t:"97",hi:true},{t:"98"},{t:"ZZZ",hi:true},{t:"Z01"},{t:"Z02"},{t:"Z03"},{t:"Z04"},{t:"Z05"},{t:"Z06"},{t:"Z07"},{t:"Z08"}]
+    },
+  ]
+},
+{
+  g:"11 — Allowance reason codes (IBT-098 / IBT-140)",
+  rows:[
+    {
+      l:"Allowance reason code (UNCL5189 subset)",ibt:"IBT-098 / IBT-140",rule:"ibr-cl-19",
+      note:"Schematron test: contains(' 41 42 60 62 63 64 65 66 67 68 70 71 88 95 100 102 103 104 105 ', ...) — exactly 19 values",
+      pills:[{t:"41",hi:true},{t:"42",hi:true},{t:"60",hi:true},{t:"62",hi:true},{t:"63",hi:true},{t:"64",hi:true},{t:"65",hi:true},{t:"66",hi:true},{t:"67",hi:true},{t:"68",hi:true},{t:"70",hi:true},{t:"71",hi:true},{t:"88",hi:true},{t:"95",hi:true},{t:"100",hi:true},{t:"102",hi:true},{t:"103",hi:true},{t:"104",hi:true},{t:"105",hi:true}]
+    },
+  ]
+},
+{
+  g:"12 — Charge reason codes (IBT-105 / IBT-145)",
+  rows:[
+    {
+      l:"Charge reason code (UNCL7161)",ibt:"IBT-105 / IBT-145",rule:"ibr-cl-20",
+      note:"Schematron test lists the full UNCL7161 set. Key commonly used values highlighted.",
+      pills:[{t:"AA",hi:true},{t:"AAA"},{t:"AAC"},{t:"AAD"},{t:"AAE"},{t:"AAF"},{t:"AAH"},{t:"AAI"},{t:"AAS"},{t:"AAT"},{t:"AAV"},{t:"AAY"},{t:"AAZ"},{t:"ABA"},{t:"ABB"},{t:"ABC"},{t:"ABD"},{t:"ABF"},{t:"ABK"},{t:"ABL"},{t:"ABN"},{t:"ABR"},{t:"ABS"},{t:"ABT"},{t:"ABU"},{t:"ACF"},{t:"ACG"},{t:"ACH"},{t:"ACI"},{t:"ACJ"},{t:"ACK"},{t:"ACL"},{t:"ACM"},{t:"ACS"},{t:"ADC"},{t:"ADE"},{t:"ADJ"},{t:"ADK"},{t:"ADL"},{t:"ADM"},{t:"ADN"},{t:"ADO"},{t:"ADP"},{t:"ADQ"},{t:"ADR",hi:true},{t:"ADT"},{t:"ADW"},{t:"ADY"},{t:"ADZ"},{t:"AEA"},{t:"AEB"},{t:"AEC"},{t:"AED"},{t:"AEF"},{t:"AEH"},{t:"AEI"},{t:"AEJ"},{t:"AEK"},{t:"AEL"},{t:"AEM"},{t:"AEN"},{t:"AEO"},{t:"AEP"},{t:"AES"},{t:"AET"},{t:"AEU"},{t:"AEV"},{t:"AEW"},{t:"AEX"},{t:"AEY"},{t:"AEZ"},{t:"AJ"},{t:"AU"},{t:"CA",hi:true},{t:"CAB"},{t:"CAD"},{t:"CAE"},{t:"CAF"},{t:"CAI"},{t:"CAJ"},{t:"CAK"},{t:"CAL"},{t:"CAM"},{t:"CAN"},{t:"CAO"},{t:"CAP"},{t:"CAQ"},{t:"CAR"},{t:"CAS"},{t:"CAT"},{t:"CAU"},{t:"CAV"},{t:"CAW"},{t:"CAX"},{t:"CAY"},{t:"CAZ"},{t:"CD"},{t:"CG",hi:true},{t:"CS"},{t:"CT"},{t:"DAB"},{t:"DAD"},{t:"DAC"},{t:"DAF"},{t:"DAG"},{t:"DAH"},{t:"DAI"},{t:"DAJ"},{t:"DAK"},{t:"DAL"},{t:"DAM"},{t:"DAN"},{t:"DAO"},{t:"DAP"},{t:"DAQ"},{t:"DL"},{t:"EG"},{t:"EP"},{t:"ER"},{t:"FAA"},{t:"FAB"},{t:"FAC"},{t:"FC",hi:true},{t:"FH"},{t:"FI",hi:true},{t:"GAA"},{t:"HAA"},{t:"HD"},{t:"HH"},{t:"IAA"},{t:"IAB"},{t:"ID"},{t:"IF"},{t:"IR",hi:true},{t:"IS"},{t:"KO"},{t:"L1"},{t:"LA"},{t:"LAA"},{t:"LAB"},{t:"LF"},{t:"MAE"},{t:"MI"},{t:"ML"},{t:"NAA"},{t:"OA"},{t:"PA",hi:true},{t:"PAA"},{t:"PC"},{t:"PL"},{t:"PRV"},{t:"RAB"},{t:"RAC"},{t:"RAD"},{t:"RAF"},{t:"RE"},{t:"RF"},{t:"RH"},{t:"RV"},{t:"SA"},{t:"SAA"},{t:"SAD"},{t:"SAE"},{t:"SAI"},{t:"SG"},{t:"SH"},{t:"SM"},{t:"SU"},{t:"TAB"},{t:"TAC"},{t:"TT"},{t:"TV"},{t:"V1"},{t:"V2"},{t:"WH"},{t:"XAA"},{t:"YY"},{t:"ZZZ",hi:true}]
+    },
+  ]
+},
+{
+  g:"13 — Attachment MIME codes (IBT-125-1)",
+  rows:[
+    {
+      l:"MIME / media type",ibt:"IBT-125-1 / @mimeCode",rule:"ibr-cl-24",
+      note:"Schematron test explicitly lists exactly 7 values. Previous answer incorrectly included image/tiff and vnd.ms-excel.",
+      pills:[{t:"application/pdf",hi:true},{t:"image/png",hi:true},{t:"image/jpeg",hi:true},{t:"text/csv",hi:true},{t:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",hi:true},{t:"application/xml",hi:true},{t:"application/vnd.oasis.opendocument.spreadsheet",hi:true}]
+    },
+  ]
+},
+{
+  g:"14 — Frequency of billing (BTAE-06)",
+  rows:[
+    {
+      l:"Frequency of billing code",ibt:"BTAE-06 / cbc:DescriptionCode (InvoicePeriod)",rule:"ibr-005-ae",
+      note:"Schematron test: contains(' DLY WKY Q15 MTH Q45 Q60 QTR YRL HYR OTH ', ...) — exactly 10 values. Previous answers had wrong codes (WEK, FOR, MON).",
+      pills:[{t:"DLY",hi:true},{t:"WKY",hi:true},{t:"Q15",hi:true},{t:"MTH",hi:true},{t:"Q45",hi:true},{t:"Q60",hi:true},{t:"QTR",hi:true},{t:"YRL",hi:true},{t:"HYR",hi:true},{t:"OTH",hi:true},{t:"DLY — Daily"},{t:"WKY — Weekly"},{t:"Q15 — Fortnightly (15-day)"},{t:"MTH — Monthly"},{t:"Q45 — Every 45 days"},{t:"Q60 — Every 60 days"},{t:"QTR — Quarterly"},{t:"YRL — Yearly"},{t:"HYR — Half-yearly"},{t:"OTH — Others (requires note in IBT-022)"}]
+    },
+  ]
+},
+];
+
+function buildUI(){
+  const c=document.getElementById('cont');
+  D.forEach((sec,si)=>{
+    const g=document.createElement('div');g.className='group';g.dataset.si=si;
+    const hd=document.createElement('div');hd.className='gh open';
+    hd.innerHTML=`<h3>${sec.g}</h3><span class="cnt">${sec.rows.length}</span><span class="chv">▾</span>`;
+    const bd=document.createElement('div');bd.className='gb open';
+    hd.onclick=()=>{hd.classList.toggle('open');bd.classList.toggle('open')};
+    sec.rows.forEach(r=>{
+      const row=document.createElement('div');row.className='row';
+      row.dataset.key=(r.l+' '+r.ibt+' '+r.rule+' '+(r.pills||[]).map(p=>p.t).join(' ')).toLowerCase();
+      const left=document.createElement('div');left.className='rl';
+      left.innerHTML=`<span class="field-name">${r.l}</span><span class="ibt">${r.ibt}</span><span class="rule">${r.rule}</span>`;
+      const right=document.createElement('div');right.className='rr';
+      (r.pills||[]).forEach(p=>{
+        const sp=document.createElement('span');
+        sp.className='pill'+(p.hi?' hi':p.sb?' sb':p.warn?' warn':'');
+        sp.textContent=p.t;right.appendChild(sp);
+      });
+      row.appendChild(left);row.appendChild(right);
+      if(r.note){
+        const n=document.createElement('div');n.className='note';
+        n.innerHTML='<span class="note-icon">⚑</span>'+r.note;
+        row.appendChild(n);
+      }
+      bd.appendChild(row);
+    });
+    g.appendChild(hd);g.appendChild(bd);c.appendChild(g);
+  });
+}
+
+function filter(){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  let any=false;
+  document.querySelectorAll('.row').forEach(r=>{
+    const m=!q||r.dataset.key.includes(q);
+    r.classList.toggle('hidden',!m);if(m)any=true;
+  });
+  document.querySelectorAll('.group').forEach(g=>{
+    const vis=[...g.querySelectorAll('.row')].some(r=>!r.classList.contains('hidden'));
+    g.classList.toggle('hidden',!vis);
+  });
+  document.getElementById('none').classList.toggle('hidden',any);
+}
+buildUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — Test Scenarios</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2230;
+  --surface3: #252b3b;
+  --border: #2a2f3d;
+  --border2: #363c50;
+  --text: #e8ecf4;
+  --text2: #8892a8;
+  --text3: #545e74;
+  --accent: #4e9cf5;
+  --green: #3ecf8e;
+  --amber: #f5a623;
+  --red: #f55a5a;
+  --purple: #a78bfa;
+  --teal: #2dd4bf;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(78,156,245,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78,156,245,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+.page { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 1.5rem; }
+
+/* Header */
+.header { padding: 2rem 0 0; display: flex; align-items: center; gap: 1rem; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.back-link:hover { color: var(--text2); }
+.header-divider { width: 1px; height: 16px; background: var(--border2); }
+.header-title { font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); }
+
+/* Hero */
+.hero { padding: 2rem 0 1.75rem; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--teal); background: rgba(45,212,191,0.1); border: 1px solid rgba(45,212,191,0.25); border-radius: 20px; padding: 4px 14px; margin-bottom: 1.1rem; letter-spacing: 0.05em; }
+.hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 { font-size: clamp(20px, 3.5vw, 30px); font-weight: 600; letter-spacing: -0.4px; margin-bottom: 0.6rem; background: linear-gradient(135deg, #e8ecf4 30%, #8892a8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero h1 span { background: linear-gradient(135deg, var(--teal), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { font-size: 13px; color: var(--text2); line-height: 1.65; max-width: 640px; }
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: grid;
+  grid-template-columns: 180px 200px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+@media (max-width: 800px) {
+  .filter-bar { grid-template-columns: 1fr 1fr; }
+  .filter-bar .count-chip { grid-column: 1 / -1; text-align: right; }
+}
+@media (max-width: 480px) {
+  .filter-bar { grid-template-columns: 1fr; }
+  .filter-bar .count-chip { text-align: left; }
+}
+
+.filter-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 5px; }
+
+.filter-group { display: flex; flex-direction: column; }
+
+select, input[type="text"] {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23545e74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
+select:focus, input[type="text"]:focus { border-color: var(--accent); }
+select option { background: #1e2230; }
+
+.count-chip { font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); white-space: nowrap; align-self: flex-end; padding-bottom: 1px; }
+.count-chip span { color: var(--teal); font-weight: 600; }
+
+/* ── Main layout ── */
+.main-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 2rem;
+}
+@media (max-width: 800px) {
+  .main-layout { grid-template-columns: 1fr; }
+}
+
+/* ── Scenario list ── */
+.scenario-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 640px;
+}
+.scenario-panel-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.scenario-list {
+  overflow-y: auto;
+  flex: 1;
+}
+.scenario-list::-webkit-scrollbar { width: 4px; }
+.scenario-list::-webkit-scrollbar-track { background: transparent; }
+.scenario-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.scenario-item {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.scenario-item:hover { background: var(--surface2); }
+.scenario-item.active { background: rgba(45,212,191,0.06); border-left: 2px solid var(--teal); }
+.scenario-item:last-child { border-bottom: none; }
+
+.si-top { display: flex; align-items: center; gap: 6px; }
+.si-id { font-size: 12px; color: var(--text); font-weight: 500; flex: 1; min-width: 0; line-height: 1.45; }
+.si-case-id { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.si-bottom { display: flex; gap: 5px; align-items: center; }
+.si-meta { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); }
+
+/* Kind badges */
+.badge {
+  font-size: 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+.badge-pos  { background: rgba(62,207,142,0.1);  color: var(--green);  border: 1px solid rgba(62,207,142,0.25);  }
+.badge-neg  { background: rgba(245,90,90,0.1);   color: var(--red);    border: 1px solid rgba(245,90,90,0.25);   }
+.badge-dom  { background: rgba(245,166,35,0.1);  color: var(--amber);  border: 1px solid rgba(245,166,35,0.25);  }
+.badge-acc  { background: rgba(78,156,245,0.1);  color: var(--accent); border: 1px solid rgba(78,156,245,0.25);  }
+.badge-teal { background: rgba(45,212,191,0.1);  color: var(--teal);   border: 1px solid rgba(45,212,191,0.25);  }
+.badge-purple { background: rgba(167,139,250,0.1); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
+
+.no-results { padding: 2.5rem 1.5rem; text-align: center; color: var(--text3); font-size: 13px; }
+
+/* ── Detail panel ── */
+.detail-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  height: 640px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.detail-panel::-webkit-scrollbar { width: 4px; }
+.detail-panel::-webkit-scrollbar-track { background: transparent; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.detail-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text3);
+  font-size: 13px;
+}
+.detail-empty-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-empty-icon svg { width: 22px; height: 22px; stroke: var(--text3); }
+
+.detail-content { flex: 1; }
+
+.detail-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+.detail-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 0.75rem; }
+.detail-id {
+  font-size: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+@media (max-width: 1000px) {
+  .detail-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.detail-field {
+  padding: 0.9rem 1.5rem;
+  background: var(--surface);
+}
+.detail-field .key { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.detail-field .val { font-size: 13px; color: var(--text); font-weight: 500; font-family: 'IBM Plex Mono', monospace; }
+.detail-field .val.dim { color: var(--text2); font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; }
+
+.detail-section {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.detail-section-label { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.detail-section-text { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.neg-block {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(245,90,90,0.03);
+}
+.neg-rule { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.neg-rule .rule-id { font-size: 12px; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--red); }
+.neg-msg { font-size: 12px; color: var(--text2); line-height: 1.55; font-family: 'IBM Plex Mono', monospace; }
+
+.detail-actions { padding: 1.25rem 1.5rem; }
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.7rem 1.25rem;
+  background: linear-gradient(135deg, var(--teal), var(--accent));
+  border: none;
+  border-radius: 7px;
+  color: #0d0f14;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.download-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.download-btn svg { width: 15px; height: 15px; stroke: currentColor; flex-shrink: 0; }
+
+.notes-block {
+  padding: 0.9rem 1.5rem;
+  background: rgba(245,166,35,0.03);
+  border-bottom: 1px solid var(--border);
+}
+.notes-block .key { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--amber); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+.notes-block .val { font-size: 12px; color: var(--text2); line-height: 1.55; }
+
+/* Footer */
+.footer { padding: 1.5rem 0; text-align: center; font-size: 11px; color: var(--text3); font-family: 'IBM Plex Mono', monospace; border-top: 1px solid var(--border); margin-top: auto; }
+.footer a { color: var(--text3); text-decoration: none; }
+.footer a:hover { color: var(--text2); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <div class="header-divider"></div>
+    <span class="header-title">Test Scenarios</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow"><span class="dot"></span>746 scenarios · 3 kinds · 14 test groups</div>
+    <h1>PINT AE <span>Test Scenarios</span></h1>
+    <p>Browse and filter all 746 test scenarios from the PINT AE Test Catalog — positive examples, negative (per-assert) cases, and domain-note instances. Select a scenario to view its details and download the XML file.</p>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-label">Kind</div>
+      <select id="kindSelect">
+        <option value="">All kinds</option>
+        <option value="Positive">Positive</option>
+        <option value="Negative">Negative</option>
+        <option value="Domain-note">Domain-note</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Test Group</div>
+      <select id="groupSelect">
+        <option value="">All groups</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Search</div>
+      <input type="text" id="searchInput" placeholder="Search words in description, e.g. standard invoice…">
+    </div>
+    <div class="count-chip" id="countChip">Loading…</div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main-layout">
+
+    <!-- Scenario list -->
+    <div class="scenario-panel">
+      <div class="scenario-panel-header" id="listHeader">Scenarios</div>
+      <div class="scenario-list" id="scenarioList"></div>
+    </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-empty" id="detailEmpty">
+        <div class="detail-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+          </svg>
+        </div>
+        <span>Select a scenario to view details</span>
+      </div>
+      <div class="detail-content" id="detailContent" style="display:none"></div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    PINT AE Billing &amp; Self-Billing · urn:peppol:pint:billing-1@ae-1 &nbsp;·&nbsp;
+    <a href="https://docs.peppol.eu/poac/ae/billing/" target="_blank">docs.peppol.eu ↗</a>
+  </div>
+
+</div>
+
+<script>
+const DOC_CLASS = {
+  '380': 'Tax Invoice', '381': 'Tax Credit Note',
+  '480': 'Commercial Invoice', '81': 'Commercial Credit Note',
+  '389': 'Self-Billing Invoice', '261': 'Self-Billing Credit Note',
+  'n/a': 'n/a'
+};
+
+const TEST_GROUPS = [
+  'Allowance-Charge','Arithmetic/Totals','Boundary/Format','Cardinality',
+  'Codelist-Value','Currency/FX','Doc-Type','Domain/Policy','Item/Classification',
+  'Party/Identifier','Payment','References/Dates','Tax-Category','Transaction-Flag'
+];
+
+let allScenarios = [];
+let filtered = [];
+let selectedId = null;
+
+// ── Populate group select ──
+const groupSelect = document.getElementById('groupSelect');
+TEST_GROUPS.forEach(g => {
+  const o = document.createElement('option');
+  o.value = g; o.textContent = g;
+  groupSelect.appendChild(o);
+});
+
+// ── Badge helpers ──
+function kindBadge(kind) {
+  const map = { 'Positive': ['badge-pos','POS'], 'Negative': ['badge-neg','NEG'], 'Domain-note': ['badge-dom','DOM'] };
+  const [cls, label] = map[kind] || ['badge-acc', kind];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function statusBadge(status) {
+  if (status === 'VERIFIED') return `<span class="badge badge-teal">VERIFIED</span>`;
+  if (status === 'DOCUMENTED') return `<span class="badge badge-dom">DOCUMENTED</span>`;
+  return `<span class="badge badge-acc">${escHtml(status)}</span>`;
+}
+
+function outcomeBadge(o) {
+  if (!o) return '';
+  if (o === 'VALID' || o === 'PASS') return `<span class="badge badge-pos">${escHtml(o)}</span>`;
+  if (o.startsWith('INVALID')) return `<span class="badge badge-neg">${escHtml(o.length > 20 ? 'INVALID' : o)}</span>`;
+  return `<span class="badge badge-dom">${escHtml(o)}</span>`;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Render list ──
+function renderList() {
+  const kindVal  = document.getElementById('kindSelect').value;
+  const groupVal = groupSelect.value;
+  const search   = document.getElementById('searchInput').value.toLowerCase();
+
+  filtered = allScenarios.filter(r => {
+    if (kindVal  && r.Kind !== kindVal) return false;
+    if (groupVal && r.TestGroup !== groupVal) return false;
+    if (search) {
+      const hay = (r['Scenario/CondFields'] + ' ' + r.TestCaseID + ' ' + r.TestGroup).toLowerCase();
+      const words = search.trim().split(/\s+/).filter(Boolean);
+      if (!words.every(w => hay.includes(w))) return false;
+    }
+    return true;
+  });
+
+  const list = document.getElementById('scenarioList');
+  document.getElementById('countChip').innerHTML = `<span>${filtered.length}</span> / ${allScenarios.length}`;
+  document.getElementById('listHeader').textContent = `${filtered.length} scenario${filtered.length !== 1 ? 's' : ''}`;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-results">No scenarios match the current filters.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(r => {
+    const active = r.TestCaseID === selectedId ? ' active' : '';
+    const docLabel = r.DocTypeCode !== 'n/a' ? `${r.DocTypeCode}` : '';
+    const catLabel = r.TaxCategory && r.TaxCategory !== 'n/a' ? r.TaxCategory : '';
+    return `<div class="scenario-item${active}" data-id="${escHtml(r.TestCaseID)}">
+      <div class="si-top">
+        <span class="si-id">${escHtml(r['Scenario/CondFields'] || r.TestCaseID)}</span>
+        ${kindBadge(r.Kind)}
+      </div>
+      <div class="si-case-id">${escHtml(r.TestCaseID)}</div>
+      <div class="si-bottom">
+        ${docLabel ? `<span class="si-meta">${escHtml(docLabel)}</span>` : ''}
+        ${catLabel ? `<span class="si-meta">· ${escHtml(catLabel)}</span>` : ''}
+        ${r.TestGroup ? `<span class="si-meta">· ${escHtml(r.TestGroup)}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.scenario-item').forEach(el => {
+    el.addEventListener('click', () => selectScenario(el.dataset.id));
+  });
+}
+
+// ── Render detail ──
+function selectScenario(id) {
+  selectedId = id;
+  const r = allScenarios.find(x => x.TestCaseID === id);
+  if (!r) return;
+
+  document.getElementById('detailEmpty').style.display = 'none';
+  document.getElementById('detailContent').style.display = 'block';
+
+  // Re-render list to update active state
+  document.querySelectorAll('.scenario-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+
+  const isNeg = r.Kind === 'Negative';
+  const isDom = r.Kind === 'Domain-note';
+  const xmlPath = r.InstanceXML ? r.InstanceXML.replace(/^catalog_xml\//, '') : '';
+  const downloadUrl = xmlPath ? `/catalog_xml/${encodeURIComponent(xmlPath)}` : '';
+
+  const txFlag = r.TransactionFlags || '';
+  const txDisplay = txFlag === '00000000' ? 'Standard (00000000)' : txFlag === 'Standard' ? 'Standard' : txFlag;
+
+  let negBlock = '';
+  if (isNeg && r.ExpectedRuleID) {
+    negBlock = `<div class="neg-block">
+      <div class="detail-section-label" style="color:var(--red);margin-bottom:8px">Target Rule</div>
+      <div class="neg-rule">
+        <span class="rule-id">${escHtml(r.ExpectedRuleID)}</span>
+      </div>
+      ${r.RuleMessage ? `<div class="neg-msg">${escHtml(r.RuleMessage)}</div>` : ''}
+    </div>`;
+  }
+
+  let notesBlock = '';
+  if (r.Notes && r.Notes.trim()) {
+    notesBlock = `<div class="notes-block">
+      <div class="key">Notes</div>
+      <div class="val">${escHtml(r.Notes)}</div>
+    </div>`;
+  }
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-badges">
+        ${kindBadge(r.Kind)}
+        ${statusBadge(r.Status)}
+        ${outcomeBadge(r.PredictedOutcome)}
+        ${r.Subtype ? `<span class="badge badge-acc">${escHtml(r.Subtype)}</span>` : ''}
+      </div>
+      <div class="detail-id">${escHtml(r.TestCaseID)}</div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-field">
+        <div class="key">Kind</div>
+        <div class="val">${escHtml(r.Kind)}</div>
+      </div>
+      <div class="detail-field">
+        <div class="key">Test Group</div>
+        <div class="val">${escHtml(r.TestGroup || '—')}</div>
+      </div>
+      <div class="detail-field">
+        <div class="key">Doc Type Code</div>
+        <div class="val">${escHtml(r.DocTypeCode)}${r.DocTypeCode !== 'n/a' ? `<br><span style="font-size:10px;color:var(--text3);font-family:'IBM Plex Sans',sans-serif;font-weight:400">${escHtml(DOC_CLASS[r.DocTypeCode] || '')}</span>` : ''}</div>
+      </div>
+      <div class="detail-field">
+        <div class="key">Tax Category</div>
+        <div class="val">${escHtml(r.TaxCategory || '—')}</div>
+      </div>
+      <div class="detail-field">
+        <div class="key">Transaction Flags</div>
+        <div class="val" style="font-size:11px">${escHtml(txDisplay || '—')}</div>
+      </div>
+      <div class="detail-field">
+        <div class="key">Currency</div>
+        <div class="val">${escHtml(r.Currency || '—')}</div>
+      </div>
+    </div>
+
+    ${r['Scenario/CondFields'] ? `
+    <div class="detail-section">
+      <div class="detail-section-label">Description</div>
+      <div class="detail-section-text">${escHtml(r['Scenario/CondFields'])}</div>
+    </div>` : ''}
+
+    ${negBlock}
+    ${notesBlock}
+
+    <div class="detail-actions">
+      ${downloadUrl
+        ? `<a href="${downloadUrl}" download="${escHtml(xmlPath)}" class="download-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Download XML &nbsp;·&nbsp; ${escHtml(xmlPath)}
+          </a>`
+        : `<span style="font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace">No XML instance available for this row.</span>`
+      }
+    </div>`;
+
+  // Scroll detail panel to top
+  document.getElementById('detailPanel').scrollTop = 0;
+}
+
+// ── Load data ──
+async function loadData() {
+  try {
+    const resp = await fetch('test_catalog_data.json');
+    allScenarios = await resp.json();
+    renderList();
+  } catch (e) {
+    document.getElementById('scenarioList').innerHTML =
+      '<div class="no-results">Failed to load test catalog data.</div>';
+    document.getElementById('countChip').textContent = 'error';
+  }
+}
+
+// ── Wire events ──
+document.getElementById('kindSelect').addEventListener('change', renderList);
+groupSelect.addEventListener('change', renderList);
+document.getElementById('searchInput').addEventListener('input', renderList);
+
+loadData();
+</script>
+</body>
+</html>

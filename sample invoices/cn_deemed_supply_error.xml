@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  PINT-AE 1.0.3 — Deemed Supply: Free Goods to Employee
+  ============================================================
+  Scenario  : Company gifts laptop permanently to employee.
+              UAE VAT Art. 7 — deemed supply arises because
+              the company claimed input VAT on the laptop.
+              Output VAT must be accounted for at open market
+              value (cost price used as proxy).
+  Supplier  : Al Mashriq Heavy Industries LLC (same company,
+              acting as supplier of the deemed supply)
+  Buyer     : Ahmed Khalid Al Mansouri (employee, individual)
+  VAT       : Standard rated (S) 5%
+              Value of supply = AED 5,500.00 (open market value)
+              VAT = AED 275.00
+              Total payable by company = AED 5,775.00
+  Currency  : AED (domestic)
+  Network   : Non-Peppol (employee has no Peppol endpoint)
+  Legal ref : UAE Federal Decree-Law No.8/2017 Art. 7(1)(b)
+              — deemed supply where input VAT was recovered
+  ============================================================
+  ProfileExecutionID bit map:
+  [DeemedSupply][SelfBilling][DisclosedAgent][ThirdParty]
+  [CreditNote][Debit][Export][Standard]
+  Deemed supply → bit 1 = 1 → 10000000
+  ============================================================
+-->
+<CreditNote xmlns:ubl ="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"
+    xmlns:cac ="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc ="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+
+	<!-- IBT-024 -->
+	<cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+	<!-- IBT-023 -->
+	<cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+	<!-- BTAE-02: Deemed supply → 01000000 (position 2 = 1 per ibr-155-ae regex ^[01]{1}1[01]{6}$) -->
+	<cbc:ProfileExecutionID>01000000</cbc:ProfileExecutionID>
+
+	<!-- IBT-001 -->
+	<cbc:ID>DS-INV-2024-001</cbc:ID>
+	<cbc:UUID>a3c1d5e7-9f2b-4a8c-b6d0-1e3f5a7c9b2d</cbc:UUID>
+	<!-- IBT-002 -->
+	<cbc:IssueDate>2024-08-15</cbc:IssueDate>
+	<!-- IBT-009: No payment due — company absorbs VAT on deemed supply -->
+	<cbc:DueDate>2024-08-15</cbc:DueDate>
+	<!-- IBT-003: 381 Credit Note -->
+	<cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
+	<!-- IBT-022 -->
+	<cbc:Note>Deemed supply invoice — Laptop permanently gifted to employee Ahmed Khalid Al Mansouri (Staff ID: EMP-2024-0142). UAE VAT Art. 7(1)(b) deemed supply applies as input VAT was recovered on original purchase. Company accounts for output VAT at open market value AED 5,500. VAT of AED 275 borne by the company.</cbc:Note>
+	<!-- IBT-005: AED — domestic supply -->
+	<cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+	<!-- IBT-010 -->
+	<cbc:BuyerReference>EMP-2024-0142</cbc:BuyerReference>
+
+	<!-- BTAE-03: DiscrepancyResponse — mandatory (1..1) for credit note (381) per PINT-AE -->
+	<cac:DiscrepancyResponse>
+		<cbc:ResponseCode>DL8.61.1.A</cbc:ResponseCode>
+		<cbc:Description>Deemed supply credit note — original deemed supply (DS-INV-2024-001) cancelled per UAE VAT Art. 7(1)(b)</cbc:Description>
+	</cac:DiscrepancyResponse>
+
+	<!-- IBT-025 / IBG-03: BillingReference — required for credit note (381) -->
+	<cac:BillingReference>
+		<cac:InvoiceDocumentReference>
+			<cbc:ID>DS-INV-2024-001</cbc:ID>
+			<cbc:IssueDate>2024-08-15</cbc:IssueDate>
+		</cac:InvoiceDocumentReference>
+	</cac:BillingReference>
+
+	<!-- Original purchase reference for audit trail -->
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>PO-IT-2024-0089</cbc:ID>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+		<cbc:DocumentDescription>Original purchase order for laptop — input VAT recovered on purchase date 2024-01-10</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+	<!-- HR approval reference -->
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>HR-GIFT-APPROVAL-2024-0142</cbc:ID>
+		<cbc:DocumentDescription>HR approval for permanent laptop gift to employee — approved by HR Director 2024-08-12</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+
+	<!-- ── SUPPLIER (IBG-04): Company acting as deemed supplier ── -->
+	<cac:AccountingSupplierParty>
+		<cac:Party>
+			<!-- IBT-034: Seller UAE Peppol endpoint -->
+			<cbc:EndpointID schemeID="0235">1000232325</cbc:EndpointID>
+			<!-- IBT-029 -->
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">100112233400003</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<cbc:Name>Al Mashriq Heavy Industries LLC</cbc:Name>
+			</cac:PartyName>
+			<!-- IBG-05 -->
+			<cac:PostalAddress>
+				<cbc:StreetName>Al Quoz Industrial Area 3, Street 8, Unit 14</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<!-- IBT-031: Seller TRN -->
+			<cac:PartyTaxScheme>
+				<cbc:CompanyID>100112233400003</cbc:CompanyID>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<cbc:RegistrationName>Al Mashriq Heavy Industries LLC</cbc:RegistrationName>
+				<!-- IBT-030 / BTAE-15 -->
+				<cbc:CompanyID schemeID="0234" schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economic Development">TL-DXB-2024-112233</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Mohammed Al Rashidi</cbc:Name>
+				<cbc:Telephone>+971-4-321-9900</cbc:Telephone>
+				<cbc:ElectronicMail>finance@almashriq-industries.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+
+	<!-- ── BUYER (IBG-07): Employee (individual, UAE resident) ── -->
+	<!-- Employee has no Peppol endpoint — use EID scheme -->
+	<cac:AccountingCustomerParty>
+		<cac:Party>
+			<!-- IBT-049: Non-Peppol individual — use EID as endpoint scheme -->
+			<cbc:EndpointID schemeID="0235">9900000098</cbc:EndpointID>
+			<!-- IBT-046 -->
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">784199012345678</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<!-- IBT-044 -->
+				<cbc:Name>Ahmed Khalid Al Mansouri</cbc:Name>
+			</cac:PartyName>
+			<!-- IBG-08 -->
+			<cac:PostalAddress>
+				<cbc:StreetName>Al Barsha South 3, Villa 12</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<!-- Employee is not VAT registered — no PartyTaxScheme -->
+			<cac:PartyLegalEntity>
+				<!-- IBT-045 -->
+				<cbc:RegistrationName>Ahmed Khalid Al Mansouri</cbc:RegistrationName>
+				<!-- IBT-047 / BTAE-16: EID as legal identifier -->
+				<cbc:CompanyID schemeAgencyID="EID" schemeAgencyName="UAE Federal Authority for Identity and Citizenship">784199012345678</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Ahmed Khalid Al Mansouri</cbc:Name>
+				<cbc:ElectronicMail>ahmed.almansouri@almashriq-industries.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingCustomerParty>
+
+	<!-- Beneficiary = employee (same as buyer for direct gift) -->
+	<cac:BuyerCustomerParty>
+		<cac:Party>
+			<cac:PartyIdentification>
+				<!-- Staff ID as beneficiary identifier -->
+				<cbc:ID>EMP-2024-0142</cbc:ID>
+			</cac:PartyIdentification>
+		</cac:Party>
+	</cac:BuyerCustomerParty>
+
+	<!-- ── DELIVERY ── -->
+	<cac:Delivery>
+		<!-- Date of handover to employee -->
+		<cbc:ActualDeliveryDate>2024-08-15</cbc:ActualDeliveryDate>
+		<cac:DeliveryLocation>
+			<cac:Address>
+				<cbc:StreetName>Al Quoz Industrial Area 3, Street 8, Unit 14</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:Address>
+		</cac:DeliveryLocation>
+	</cac:Delivery>
+
+
+	<!-- ibr-191-ae: PaymentMeans present as fallback — deemed supply is exempt but included for compatibility -->
+	<cac:PaymentMeans>
+		<!-- 97 = Clearing between partners / internal settlement -->
+		<cbc:PaymentMeansCode>97</cbc:PaymentMeansCode>
+		<cbc:PaymentID>DEEMED-SUPPLY-DS-INV-2024-001</cbc:PaymentID>
+	</cac:PaymentMeans>
+	<cac:PaymentTerms>
+		<cbc:Note>Deemed supply — no payment required from employee. VAT of AED 275.00 borne by Al Mashriq Heavy Industries LLC as the deemed supplier per UAE VAT Law Art. 7(1)(b).</cbc:Note>
+	</cac:PaymentTerms>
+
+	<!-- ── TAX TOTAL: Invoice currency AED = Tax currency AED ── -->
+	<!-- Single TaxTotal (no dual currency needed — both AED) -->
+	<cac:TaxTotal>
+		<!-- IBT-110: Total VAT = AED 275.00 (5% × 5,500) -->
+		<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+		<!-- IBG-23: S Standard rated 5% -->
+		<cac:TaxSubtotal>
+			<!-- IBT-116 -->
+			<cbc:TaxableAmount currencyID="AED">5500.00</cbc:TaxableAmount>
+			<!-- IBT-117 -->
+			<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<!-- IBT-118 -->
+				<cbc:ID>S</cbc:ID>
+				<!-- IBT-119 -->
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<!-- Second TaxTotal: AED accounting currency (IBT-111 / BTAE-20) -->
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="AED">5500.00</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+
+	<!-- ── LEGAL MONETARY TOTAL ── -->
+	<cac:LegalMonetaryTotal>
+		<!-- IBT-106: Net amount excl VAT -->
+		<cbc:LineExtensionAmount currencyID="AED">5500.00</cbc:LineExtensionAmount>
+		<!-- IBT-109: Tax exclusive -->
+		<cbc:TaxExclusiveAmount currencyID="AED">5500.00</cbc:TaxExclusiveAmount>
+		<!-- IBT-112: Tax inclusive = 5500 + 275 -->
+		<cbc:TaxInclusiveAmount currencyID="AED">5775.00</cbc:TaxInclusiveAmount>
+		<cbc:AllowanceTotalAmount currencyID="AED">0.00</cbc:AllowanceTotalAmount>
+		<cbc:ChargeTotalAmount currencyID="AED">0.00</cbc:ChargeTotalAmount>
+		<!-- IBT-113: Prepaid amount = full invoice value (company absorbs cost and VAT) -->
+		<cbc:PrepaidAmount currencyID="AED">5775.00</cbc:PrepaidAmount>
+		<!-- IBT-115: PayableAmount = TaxInclusive(5775) - PrepaidAmount(5775) = 0 -->
+		<cbc:PayableAmount currencyID="AED">0.00</cbc:PayableAmount>
+	</cac:LegalMonetaryTotal>
+
+	<!-- ══════════════════════════════════════════════════════════
+	     LINE 1: Laptop — Deemed Supply
+	     Open market value: AED 5,500.00
+	     VAT (S 5%): AED 275.00
+	     HS Code: 847130 — Portable digital ADP machines
+	     ══════════════════════════════════════════════════════════ -->
+	<cac:CreditNoteLine>
+		<!-- IBT-126 -->
+		<cbc:ID>1</cbc:ID>
+		<!-- IBT-129/130 -->
+		<cbc:CreditedQuantity unitCode="EA">1</cbc:CreditedQuantity>
+		<!-- IBT-131 -->
+		<cbc:LineExtensionAmount currencyID="AED">5500.00</cbc:LineExtensionAmount>
+
+		<!-- IBG-31 -->
+		<cac:Item>
+			<!-- IBT-154 -->
+			<cbc:Description>Laptop computer — Dell Latitude 5540, Intel Core i7, 16GB RAM, 512GB SSD, permanently gifted to employee Ahmed Khalid Al Mansouri (Staff ID: EMP-2024-0142). Original purchase date: 2024-01-10. Input VAT recovered on original purchase. Deemed supply per UAE VAT Art. 7(1)(b). Open market value used as VAT base.</cbc:Description>
+			<!-- IBT-153 -->
+			<cbc:Name>Laptop — Deemed Supply to Employee (Gift)</cbc:Name>
+			<!-- IBT-157 -->
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="0160">DELL-LAT-5540-2024</cbc:ID>
+			</cac:StandardItemIdentification>
+			<!-- IBT-158: HS code for laptops -->
+			<cac:CommodityClassification>
+				<cbc:ItemClassificationCode listID="HS">847130</cbc:ItemClassificationCode>
+			</cac:CommodityClassification>
+			<!-- IBG-30 -->
+			<cac:ClassifiedTaxCategory>
+				<!-- IBT-151 -->
+				<cbc:ID>S</cbc:ID>
+				<!-- IBT-152 -->
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:ClassifiedTaxCategory>
+		</cac:Item>
+
+		<!-- IBG-29 -->
+		<cac:Price>
+			<!-- IBT-146: Open market value as unit price -->
+			<cbc:PriceAmount currencyID="AED">5500.00</cbc:PriceAmount>
+			<!-- IBT-149 -->
+			<cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
+			<!-- IBT-148: Gross price = net price (no discount) -->
+			<cac:AllowanceCharge>
+				<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+				<cbc:Amount currencyID="AED">0.00</cbc:Amount>
+				<cbc:BaseAmount currencyID="AED">5500.00</cbc:BaseAmount>
+			</cac:AllowanceCharge>
+		</cac:Price>
+
+		<!-- BTAE-10 / BTAE-08: Always in AED -->
+		<cac:ItemPriceExtension>
+			<!-- BTAE-10: Line amount payable in AED -->
+			<cbc:Amount currencyID="AED">5500.00</cbc:Amount>
+			<!-- BTAE-08: VAT line amount in AED -->
+			<cac:TaxTotal>
+				<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+			</cac:TaxTotal>
+		</cac:ItemPriceExtension>
+
+	</cac:CreditNoteLine>
+
+</CreditNote>

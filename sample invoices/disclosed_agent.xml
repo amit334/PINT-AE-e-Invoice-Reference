@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================
+  PINT-AE 1.0.3 — Disclosed Agent Billing
+  ============================================================
+  Scenario  : Travel management company (TMC) "Horizon Travel
+              Services LLC" acts as a disclosed agent on behalf
+              of corporate client "Gulf Dynamics FZE".
+              TMC books airline tickets and hotel from Emirates
+              Airlines and Rotana Hotels and raises a single
+              consolidated invoice to the client, clearly
+              disclosing that it is acting as agent.
+              Under UAE VAT, the supply is treated as made
+              directly by the principal (Emirates / Rotana) to
+              the client; the agent's commission is a separate
+              supply. Both are captured here per PINT-AE rules.
+  Supplier  : Horizon Travel Services LLC (Disclosed Agent)
+  Buyer     : Gulf Dynamics FZE (Corporate Client / Principal)
+  VAT       : Standard rated (S) 5%
+              Net supply value = AED 18,500.00
+              Agent commission  = AED 1,500.00
+              Total net         = AED 20,000.00
+              VAT (5%)          = AED 1,000.00
+              Total payable     = AED 21,000.00
+  Currency  : AED
+  Legal ref : UAE Federal Decree-Law No.8/2017 Art. 9
+              UAE VAT Executive Regulations Art. 45
+              — Supplies made through agents
+  ============================================================
+  ProfileExecutionID bitmap (8 digits):
+  Pos 1: Free Trade Zone       → 0
+  Pos 2: Deemed Supply         → 0
+  Pos 3: Profit Margin Scheme  → 0
+  Pos 4: Summary Invoice       → 0
+  Pos 5: Continuous Supply     → 0
+  Pos 6: Disclosed Agent Billing → 1  ← this invoice
+  Pos 7: Supply via e-commerce → 0
+  Pos 8: Exports               → 0
+  Result → 00000100
+  ============================================================
+-->
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2">
+
+	<!-- IBT-024: Specification identifier -->
+	<cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+	<!-- IBT-023: Business process type -->
+	<cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+	<!-- BTAE-02: Disclosed Agent Billing → bit 6 = 1 → 00000100 -->
+	<cbc:ProfileExecutionID>00000100</cbc:ProfileExecutionID>
+
+	<!-- IBT-001: Invoice number -->
+	<cbc:ID>DAB-INV-2024-00782</cbc:ID>
+	<cbc:UUID>f7a2e4c8-1b3d-4f6a-9c0e-2d4b6a8c0e1f</cbc:UUID>
+	<!-- IBT-002: Issue date -->
+	<cbc:IssueDate>2024-09-10</cbc:IssueDate>
+	<!-- IBT-009: Payment due date -->
+	<cbc:DueDate>2024-09-25</cbc:DueDate>
+	<!-- IBT-003: 380 Commercial Invoice -->
+	<cbc:InvoiceTypeCode name="00000100">380</cbc:InvoiceTypeCode>
+	<!-- IBT-022: Invoice note — agent disclosure mandatory under UAE VAT Art. 9 -->
+	<cbc:Note>DISCLOSED AGENT BILLING — Horizon Travel Services LLC acts solely as disclosed agent on behalf of Gulf Dynamics FZE. Supplies of airline tickets (Emirates Airlines) and hotel accommodation (Rotana Hotels) are treated as made directly by the respective principals to the buyer under UAE VAT Executive Regulations Art. 45. Agent commission of AED 1,500.00 is a separate taxable supply by the agent. VAT TRN of each principal is disclosed below.</cbc:Note>
+	<!-- IBT-005: Document currency AED -->
+	<cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+	<!-- IBT-006: Tax currency AED -->
+	<cbc:TaxCurrencyCode>AED</cbc:TaxCurrencyCode>
+	<!-- IBT-010: Buyer reference / cost centre -->
+	<cbc:BuyerReference>CC-GULF-DYN-TRAVEL-Q3-2024</cbc:BuyerReference>
+
+	<!-- IBT-013: Purchase order reference -->
+	<cac:OrderReference>
+		<cbc:ID>PO-GD-2024-4471</cbc:ID>
+	</cac:OrderReference>
+
+	<!-- IBG-24: Additional document references -->
+	<!-- Travel booking confirmation -->
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>BKG-EK-2024-887231</cbc:ID>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+		<cbc:DocumentDescription>Emirates Airlines booking confirmation — DXB-LHR-DXB, 15–22 Sep 2024, passenger: Saeed Humaid Al Falasi</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+	<!-- Hotel booking confirmation -->
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>BKG-ROT-2024-335509</cbc:ID>
+		<cbc:DocumentDescription>Rotana Hotels booking confirmation — The Twisting Tower, Dubai, 15–22 Sep 2024</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+	<!-- Agent appointment letter -->
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>AGENT-AUTH-GD-2024-007</cbc:ID>
+		<cbc:DocumentDescription>Disclosed agent appointment letter — Gulf Dynamics FZE appoints Horizon Travel Services LLC as disclosed travel agent — effective 2024-01-01</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+
+	<!-- ── SUPPLIER (IBG-04): Disclosed Agent ── -->
+	<cac:AccountingSupplierParty>
+		<cac:Party>
+			<!-- IBT-034: Agent's UAE Peppol endpoint -->
+			<cbc:EndpointID schemeID="0235">1434553328</cbc:EndpointID>
+			<!-- IBT-029: Agent party ID -->
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">100456789000001</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<cbc:Name>Horizon Travel Services LLC</cbc:Name>
+			</cac:PartyName>
+			<!-- IBG-05: Agent postal address -->
+			<cac:PostalAddress>
+				<cbc:StreetName>Business Bay, Opus Tower, Office 1204</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<!-- IBT-031: Agent TRN -->
+			<cac:PartyTaxScheme>
+				<cbc:CompanyID>100456789000001</cbc:CompanyID>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<cbc:RegistrationName>Horizon Travel Services LLC</cbc:RegistrationName>
+				<!-- IBT-030 / BTAE-15: Trade licence -->
+				<cbc:CompanyID schemeID="0234" schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economic Development">TL-DXB-2023-456789</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Fatima Nasser Al Hashimi</cbc:Name>
+				<cbc:Telephone>+971-4-456-7890</cbc:Telephone>
+				<cbc:ElectronicMail>corporate@horizontravel.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+
+	<!-- ── BUYER (IBG-07): Corporate Client (Principal) ── -->
+	<cac:AccountingCustomerParty>
+		<cac:Party>
+			<!-- IBT-049: Buyer Peppol endpoint -->
+			<cbc:EndpointID schemeID="0235">1434553326</cbc:EndpointID>
+			<!-- IBT-046: Buyer party ID -->
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">100678901200005</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<!-- IBT-044 -->
+				<cbc:Name>Gulf Dynamics FZE</cbc:Name>
+			</cac:PartyName>
+			<!-- IBG-08: Buyer postal address -->
+			<cac:PostalAddress>
+				<cbc:StreetName>JAFZA, Plot JA-07, Jebel Ali Free Zone</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<!-- IBT-048: Buyer TRN -->
+			<cac:PartyTaxScheme>
+				<cbc:CompanyID>100678901200005</cbc:CompanyID>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<!-- IBT-045 -->
+				<cbc:RegistrationName>Gulf Dynamics FZE</cbc:RegistrationName>
+				<!-- IBT-047 / BTAE-16: Trade licence (JAFZA) -->
+				<cbc:CompanyID schemeID="0234" schemeAgencyID="TL" schemeAgencyName="Jebel Ali Free Zone Authority">JAFZA-2019-00678901</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Saeed Humaid Al Falasi</cbc:Name>
+				<cbc:Telephone>+971-4-789-0123</cbc:Telephone>
+				<cbc:ElectronicMail>accounts@gulfdynamics.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingCustomerParty>
+
+	<!-- ── PAYEE: Horizon Travel Services LLC (same as supplier/agent) ── -->
+	<!-- Agent collects full amount on behalf of principals then remits -->
+	<cac:PayeeParty>
+		<cac:PartyIdentification>
+			<cbc:ID schemeID="0234">100456789000001</cbc:ID>
+		</cac:PartyIdentification>
+		<cac:PartyName>
+			<cbc:Name>Horizon Travel Services LLC</cbc:Name>
+		</cac:PartyName>
+		<cac:PartyLegalEntity>
+			<cbc:CompanyID schemeID="0234">TL-DXB-2023-456789</cbc:CompanyID>
+		</cac:PartyLegalEntity>
+	</cac:PayeeParty>
+
+	<!-- ── DELIVERY ── -->
+	<cac:Delivery>
+		<cbc:ActualDeliveryDate>2024-09-22</cbc:ActualDeliveryDate>
+		<cac:DeliveryLocation>
+			<cac:Address>
+				<cbc:StreetName>JAFZA, Plot JA-07, Jebel Ali Free Zone</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:Address>
+		</cac:DeliveryLocation>
+	</cac:Delivery>
+
+	<!-- ── PAYMENT MEANS ── -->
+	<cac:PaymentMeans>
+		<!-- 30 = Credit transfer (bank transfer) -->
+		<cbc:PaymentMeansCode>30</cbc:PaymentMeansCode>
+		<cbc:PaymentDueDate>2024-09-25</cbc:PaymentDueDate>
+		<cbc:PaymentID>DAB-INV-2024-00782</cbc:PaymentID>
+		<cac:PayeeFinancialAccount>
+			<cbc:ID>AE070331234567890123456</cbc:ID>
+			<cbc:Name>Horizon Travel Services LLC</cbc:Name>
+			<cac:FinancialInstitutionBranch>
+				<cbc:ID>BOMLAEADXXX</cbc:ID>
+				<cbc:Name>Bank of Middle East — Business Bay Branch</cbc:Name>
+			</cac:FinancialInstitutionBranch>
+		</cac:PayeeFinancialAccount>
+	</cac:PaymentMeans>
+	<cac:PaymentTerms>
+		<cbc:Note>Payment due within 15 days of invoice date. Agent will remit principal amounts to Emirates Airlines and Rotana Hotels upon receipt. Agent retains commission of AED 1,500.00 + VAT AED 75.00.</cbc:Note>
+	</cac:PaymentTerms>
+
+	<!-- ── TAX TOTAL ── -->
+	<cac:TaxTotal>
+		<!-- IBT-110: Total VAT = AED 1,000.00 (5% × 20,000) -->
+		<cbc:TaxAmount currencyID="AED">1000.00</cbc:TaxAmount>
+		<!-- IBG-23: Standard rated 5% — principal supply (airline + hotel) -->
+		<cac:TaxSubtotal>
+			<!-- IBT-116: Taxable amount for principal supplies = AED 18,500 -->
+			<cbc:TaxableAmount currencyID="AED">18500.00</cbc:TaxableAmount>
+			<!-- IBT-117 -->
+			<cbc:TaxAmount currencyID="AED">925.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<!-- IBT-118 -->
+				<cbc:ID>S</cbc:ID>
+				<!-- IBT-119 -->
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+		<!-- IBG-23: Standard rated 5% — agent commission -->
+		<cac:TaxSubtotal>
+			<!-- IBT-116: Agent commission net = AED 1,500 -->
+			<cbc:TaxableAmount currencyID="AED">1500.00</cbc:TaxableAmount>
+			<!-- IBT-117 -->
+			<cbc:TaxAmount currencyID="AED">75.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<!-- IBT-111 / BTAE-20: VAT in AED accounting currency (same as document currency) -->
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="AED">1000.00</cbc:TaxAmount>
+	</cac:TaxTotal>
+
+	<!-- ── LEGAL MONETARY TOTAL ── -->
+	<cac:LegalMonetaryTotal>
+		<!-- IBT-106: Sum of line net amounts -->
+		<cbc:LineExtensionAmount currencyID="AED">20000.00</cbc:LineExtensionAmount>
+		<!-- IBT-109: Tax exclusive total -->
+		<cbc:TaxExclusiveAmount currencyID="AED">20000.00</cbc:TaxExclusiveAmount>
+		<!-- IBT-112: Tax inclusive total = 20,000 + 1,000 -->
+		<cbc:TaxInclusiveAmount currencyID="AED">21000.00</cbc:TaxInclusiveAmount>
+		<cbc:AllowanceTotalAmount currencyID="AED">0.00</cbc:AllowanceTotalAmount>
+		<cbc:ChargeTotalAmount currencyID="AED">0.00</cbc:ChargeTotalAmount>
+		<cbc:PrepaidAmount currencyID="AED">0.00</cbc:PrepaidAmount>
+		<!-- IBT-115: Amount due -->
+		<cbc:PayableAmount currencyID="AED">21000.00</cbc:PayableAmount>
+	</cac:LegalMonetaryTotal>
+
+	<!-- ══════════════════════════════════════════════════════════
+	     LINE 1: Emirates Airlines — Return Flights DXB-LHR-DXB
+	     Principal: Emirates Airlines (TRN: 100100200300001)
+	     Net: AED 12,000.00  |  VAT 5%: AED 600.00
+	     ══════════════════════════════════════════════════════════ -->
+	<cac:InvoiceLine>
+		<!-- IBT-126 -->
+		<cbc:ID>1</cbc:ID>
+		<!-- IBT-129/130 -->
+		<cbc:InvoicedQuantity unitCode="EA">2</cbc:InvoicedQuantity>
+		<!-- IBT-131 -->
+		<cbc:LineExtensionAmount currencyID="AED">12000.00</cbc:LineExtensionAmount>
+		<!-- Line note disclosing the principal per UAE VAT Art. 9 -->
+		<cbc:Note>Principal supplier: Emirates Airlines LLC — TRN 100100200300001. Agent acts on disclosed basis; VAT obligation rests with principal.</cbc:Note>
+
+		<cac:Item>
+			<!-- IBT-154 -->
+			<cbc:Description>Economy class return air tickets Dubai (DXB) to London Heathrow (LHR) and return — travel dates 15 Sep 2024 (outbound) and 22 Sep 2024 (inbound) — passenger: Saeed Humaid Al Falasi — booking ref EK-887231.</cbc:Description>
+			<!-- IBT-153 -->
+			<cbc:Name>Air Ticket — Emirates Airlines DXB-LHR-DXB (Economy, Return)</cbc:Name>
+			<!-- IBT-157: IATA airline code as standard identifier -->
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="0160">EK-TICKET-DXB-LHR-ECO-RT</cbc:ID>
+			</cac:StandardItemIdentification>
+			<!-- IBT-158: UNSPSC air transport -->
+			<cac:CommodityClassification>
+				<cbc:ItemClassificationCode listID="UNSPSC">78111803</cbc:ItemClassificationCode>
+			</cac:CommodityClassification>
+			<!-- IBG-30 -->
+			<cac:ClassifiedTaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:ClassifiedTaxCategory>
+		</cac:Item>
+
+		<!-- IBG-29 -->
+		<cac:Price>
+			<!-- IBT-146: Per ticket price -->
+			<cbc:PriceAmount currencyID="AED">6000.00</cbc:PriceAmount>
+			<cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
+			<cac:AllowanceCharge>
+				<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+				<cbc:Amount currencyID="AED">0.00</cbc:Amount>
+				<cbc:BaseAmount currencyID="AED">6000.00</cbc:BaseAmount>
+			</cac:AllowanceCharge>
+		</cac:Price>
+
+		<!-- BTAE-10 / BTAE-08 -->
+		<cac:ItemPriceExtension>
+			<cbc:Amount currencyID="AED">12000.00</cbc:Amount>
+			<cac:TaxTotal>
+				<cbc:TaxAmount currencyID="AED">600.00</cbc:TaxAmount>
+			</cac:TaxTotal>
+		</cac:ItemPriceExtension>
+	</cac:InvoiceLine>
+
+	<!-- ══════════════════════════════════════════════════════════
+	     LINE 2: Rotana Hotels — Hotel Accommodation 7 Nights
+	     Principal: Rotana Hotel Management Corp (TRN: 100300400500002)
+	     Net: AED 6,500.00  |  VAT 5%: AED 325.00
+	     ══════════════════════════════════════════════════════════ -->
+	<cac:InvoiceLine>
+		<cbc:ID>2</cbc:ID>
+		<cbc:InvoicedQuantity unitCode="DAY">7</cbc:InvoicedQuantity>
+		<cbc:LineExtensionAmount currencyID="AED">6500.00</cbc:LineExtensionAmount>
+		<cbc:Note>Principal supplier: Rotana Hotel Management Corp — TRN 100300400500002. Agent acts on disclosed basis; VAT obligation rests with principal.</cbc:Note>
+
+		<cac:Item>
+			<cbc:Description>Superior room accommodation at The Twisting Tower, Dubai — 7 nights (15–22 Sep 2024) — guest: Saeed Humaid Al Falasi — booking ref ROT-335509. Rate: AED 928.57/night.</cbc:Description>
+			<cbc:Name>Hotel Accommodation — Rotana Towers Dubai (7 Nights, Superior Room)</cbc:Name>
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="0160">ROT-TWISTTWR-SUP-7N</cbc:ID>
+			</cac:StandardItemIdentification>
+			<!-- UNSPSC hotel accommodation -->
+			<cac:CommodityClassification>
+				<cbc:ItemClassificationCode listID="UNSPSC">90111500</cbc:ItemClassificationCode>
+			</cac:CommodityClassification>
+			<cac:ClassifiedTaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:ClassifiedTaxCategory>
+		</cac:Item>
+
+		<cac:Price>
+			<!-- IBT-146: Per night rate -->
+			<cbc:PriceAmount currencyID="AED">928.57</cbc:PriceAmount>
+			<cbc:BaseQuantity unitCode="DAY">1</cbc:BaseQuantity>
+			<cac:AllowanceCharge>
+				<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+				<cbc:Amount currencyID="AED">0.00</cbc:Amount>
+				<cbc:BaseAmount currencyID="AED">928.57</cbc:BaseAmount>
+			</cac:AllowanceCharge>
+		</cac:Price>
+
+		<cac:ItemPriceExtension>
+			<cbc:Amount currencyID="AED">6500.00</cbc:Amount>
+			<cac:TaxTotal>
+				<cbc:TaxAmount currencyID="AED">325.00</cbc:TaxAmount>
+			</cac:TaxTotal>
+		</cac:ItemPriceExtension>
+	</cac:InvoiceLine>
+
+	<!-- ══════════════════════════════════════════════════════════
+	     LINE 3: Agent Commission — Horizon Travel Services LLC
+	     This is the agent's own supply (not a principal supply)
+	     Net: AED 1,500.00  |  VAT 5%: AED 75.00
+	     ══════════════════════════════════════════════════════════ -->
+	<cac:InvoiceLine>
+		<cbc:ID>3</cbc:ID>
+		<cbc:InvoicedQuantity unitCode="EA">1</cbc:InvoicedQuantity>
+		<cbc:LineExtensionAmount currencyID="AED">1500.00</cbc:LineExtensionAmount>
+		<cbc:Note>Agent's own supply — commission for travel management services rendered by Horizon Travel Services LLC in its capacity as disclosed agent. TRN: 100456789000001.</cbc:Note>
+
+		<cac:Item>
+			<cbc:Description>Travel management commission — arrangement and booking of air travel and hotel accommodation for Gulf Dynamics FZE corporate trip (booking refs EK-887231 and ROT-335509). Commission rate: 7.5% of principal supply value AED 18,500 excl. VAT = AED 1,500.</cbc:Description>
+			<cbc:Name>Agent Commission — Travel Management Services (Disclosed Agent)</cbc:Name>
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="0160">HTS-COMMISSION-CORP-TRAVEL</cbc:ID>
+			</cac:StandardItemIdentification>
+			<!-- UNSPSC travel agency services -->
+			<cac:CommodityClassification>
+				<cbc:ItemClassificationCode listID="UNSPSC">90111600</cbc:ItemClassificationCode>
+			</cac:CommodityClassification>
+			<cac:ClassifiedTaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:ClassifiedTaxCategory>
+		</cac:Item>
+
+		<cac:Price>
+			<cbc:PriceAmount currencyID="AED">1500.00</cbc:PriceAmount>
+			<cbc:BaseQuantity unitCode="EA">1</cbc:BaseQuantity>
+			<cac:AllowanceCharge>
+				<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+				<cbc:Amount currencyID="AED">0.00</cbc:Amount>
+				<cbc:BaseAmount currencyID="AED">1500.00</cbc:BaseAmount>
+			</cac:AllowanceCharge>
+		</cac:Price>
+
+		<cac:ItemPriceExtension>
+			<cbc:Amount currencyID="AED">1500.00</cbc:Amount>
+			<cac:TaxTotal>
+				<cbc:TaxAmount currencyID="AED">75.00</cbc:TaxAmount>
+			</cac:TaxTotal>
+		</cac:ItemPriceExtension>
+	</cac:InvoiceLine>
+
+</Invoice>

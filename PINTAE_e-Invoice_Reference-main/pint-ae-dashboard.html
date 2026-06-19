@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — Field Requirements Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2230;
+  --border: #2a2f3d;
+  --border2: #363c50;
+  --text: #e8ecf4;
+  --text2: #8892a8;
+  --text3: #545e74;
+  --accent: #4e9cf5;
+  --accent2: #3a7fd4;
+  --green: #3ecf8e;
+  --amber: #f5a623;
+  --red: #f55a5a;
+  --purple: #a78bfa;
+  --teal: #2dd4bf;
+  --pink: #f472b6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* Topbar */
+.topbar { padding: 1rem 1.5rem; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border2); border-radius: 5px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+.back-btn:hover { color: var(--text); border-color: var(--accent); }
+.page-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.page-sub { font-size: 11px; color: var(--text2); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+.badge { font-size: 10px; font-family: 'IBM Plex Mono', monospace; padding: 2px 8px; border-radius: 999px; font-weight: 500; border: 1px solid; }
+.badge-blue { background: rgba(78,156,245,0.1); color: var(--accent); border-color: rgba(78,156,245,0.3); }
+.badge-green { background: rgba(62,207,142,0.1); color: var(--green); border-color: rgba(62,207,142,0.3); }
+.badge-amber { background: rgba(245,166,35,0.1); color: var(--amber); border-color: rgba(245,166,35,0.3); }
+
+/* Selectors */
+.selectors {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.selector-group {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+}
+.selector-group label {
+  display: block;
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+}
+.selector-group select {
+  width: 100%;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+.selector-group select:focus { outline: none; border-color: var(--accent); }
+.selector-group select option { background: #1e2230; }
+
+/* Validation banner */
+.validation-bar {
+  padding: 10px 1.5rem;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.validation-bar.valid { background: rgba(62,207,142,0.08); color: var(--green); border-color: rgba(62,207,142,0.2); display: flex; }
+.validation-bar.invalid { background: rgba(245,90,90,0.08); color: var(--red); border-color: rgba(245,90,90,0.2); display: flex; }
+.validation-bar.info { background: rgba(78,156,245,0.08); color: var(--accent); border-color: rgba(78,156,245,0.2); display: flex; }
+.vdot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+/* Main layout */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  min-height: calc(100vh - 200px);
+}
+.panel {
+  background: var(--bg);
+  overflow-y: auto;
+}
+.panel-header {
+  padding: 1rem 1.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-title {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.field-count {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+}
+
+/* Field sections */
+.section { padding: 0.75rem 0; }
+.section-label {
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1.5rem 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 80px;
+  align-items: start;
+  padding: 6px 1.5rem 6px;
+  gap: 10px;
+  transition: background 0.1s;
+}
+.field-row:hover { background: var(--surface); }
+.field-row.mandatory { border-left: 2px solid var(--red); }
+.field-row.conditional { border-left: 2px solid var(--amber); }
+.field-row.optional { border-left: 2px solid var(--border2); }
+
+.field-id {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  padding-top: 2px;
+  line-height: 1.4;
+}
+.field-id.btae { color: var(--purple); }
+.field-body {}
+.field-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+}
+.field-path {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 2px;
+  word-break: break-all;
+}
+.field-path .cac { color: var(--teal); opacity: 0.8; }
+.field-path .cbc { color: var(--accent); opacity: 0.8; }
+.field-note {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.cardinality {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-align: right;
+  padding-top: 2px;
+}
+.cardinality.M { color: var(--red); }
+.cardinality.C { color: var(--amber); }
+.cardinality.O { color: var(--text3); }
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.6rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text2);
+}
+.legend-line { width: 16px; height: 2px; }
+.legend-line.M { background: var(--red); }
+.legend-line.C { background: var(--amber); }
+.legend-line.O { background: var(--border2); }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text3);
+  gap: 8px;
+}
+.empty-state svg { opacity: 0.3; }
+.empty-state p { font-size: 13px; }
+
+/* Right panel - XML preview */
+.xml-panel {
+  background: var(--bg);
+  overflow-y: auto;
+}
+.xml-content {
+  padding: 1rem 1.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--text2);
+  white-space: pre;
+}
+.xml-tag { color: var(--teal); }
+.xml-attr { color: var(--purple); }
+.xml-val { color: var(--amber); }
+.xml-comment { color: var(--text3); }
+.xml-m { color: var(--red); font-weight: 500; }
+.xml-c { color: var(--amber); }
+
+/* Conditional notes panel */
+.cond-panel {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+}
+.cond-title {
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+.cond-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.cond-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.cond-rule { font-size: 11px; font-weight: 500; color: var(--amber); margin-bottom: 2px; font-family: 'IBM Plex Mono', monospace; }
+.cond-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn">← Back</a>
+    <div>
+      <div class="page-title">Required Fields Dashboard</div>
+      <div class="page-sub">Select doc type, transaction type &amp; VAT category — see every mandatory field with XPaths</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="badge badge-blue">UBL 2.1</span>
+    <span class="badge badge-green">Billing + Self-Billing</span>
+    <span class="badge badge-amber">6 Doc Types · 8 Txn Types · 6 VAT Codes</span>
+  </div>
+</div>
+
+<div class="selectors">
+  <div class="selector-group">
+    <label>① Document Type (IBT-003)</label>
+    <select id="selDoc" onchange="onDocTxnChange()">
+      <option value="">— Select document type —</option>
+      <option value="380">380 — Tax Invoice</option>
+      <option value="381">381 — Tax Credit Note</option>
+      <option value="389">389 — Self-Billing Invoice</option>
+      <option value="261">261 — Self-Billing Credit Note</option>
+      <option value="480">480 — Invoice (Out of Scope)</option>
+      <option value="81">81 — Credit Note (Out of Scope)</option>
+    </select>
+  </div>
+  <div class="selector-group">
+    <label>② Transaction Type (BTAE-02 / ProfileExecutionID)</label>
+    <select id="selTxn" onchange="onDocTxnChange()">
+      <option value="">— Select transaction type —</option>
+      <option value="00000000">00000000 — Standard</option>
+      <option value="10000000">10000000 — Free Trade Zone</option>
+      <option value="01000000">01000000 — Deemed Supply</option>
+      <option value="00100000">00100000 — Profit Margin Scheme</option>
+      <option value="00010000">00010000 — Summary Invoice</option>
+      <option value="00001000">00001000 — Continuous Supply</option>
+      <option value="00000100">00000100 — Disclosed Agent Billing</option>
+      <option value="00000010">00000010 — E-commerce Supply</option>
+      <option value="00000001">00000001 — Exports</option>
+    </select>
+  </div>
+  <div class="selector-group">
+    <label>③ VAT Category Code (IBT-151)</label>
+    <select id="selVat" onchange="update()">
+      <option value="">— Select doc type &amp; transaction first —</option>
+    </select>
+  </div>
+</div>
+
+<div class="validation-bar" id="valBar">
+  <span class="vdot"></span>
+  <span id="valMsg"></span>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="panel" id="leftPanel">
+    <div class="panel-header">
+      <span class="panel-title">Required &amp; Conditional Fields</span>
+      <span class="field-count" id="fieldCount"></span>
+    </div>
+    <div id="fieldList">
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <p>Select all three options above to see required fields</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel xml-panel" id="rightPanel">
+    <div class="panel-header">
+      <span class="panel-title">UBL Structure Preview</span>
+      <span class="field-count" id="xmlNote">Mandatory fields highlighted</span>
+    </div>
+    <div id="xmlContent">
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        <p>XML preview appears here</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-line M"></div> Mandatory</div>
+  <div class="legend-item"><div class="legend-line C"></div> Conditional (rule-based)</div>
+  <div class="legend-item"><div class="legend-line O"></div> Optional</div>
+</div>
+
+<script>
+// ====================================================
+// HELPERS
+// ====================================================
+function getVats(vat) { return vat ? vat.split('+') : []; }
+function f(n) { return n.toFixed(2); }
+
+// ====================================================
+// VAT OPTIONS — dynamic per doc + txn
+// ====================================================
+const VAT_LABELS = {
+  'S':      'S — Standard Rate (5%)',
+  'AE':     'AE — VAT Reverse Charge',
+  'Z':      'Z — Zero Rated',
+  'E':      'E — Exempt from Tax',
+  'O':      'O — Not Subject to VAT',
+  'N':      'N — Standard Rate Additional VAT (Margin)',
+  'S+Z':    'S+Z — Mixed Standard & Zero-Rated',
+  'S+AE':   'S+AE — Mixed Standard & Reverse Charge',
+  'AE+Z':   'AE+Z — Mixed Reverse Charge & Zero-Rated',
+  'S+AE+Z': 'S+AE+Z — Standard, Reverse Charge & Zero-Rated',
+  'S+E':    'S+E — Mixed Standard & Exempt',
+  'S+O':    'S+O — Mixed Standard & Out-of-Scope',
+  'Z+E':    'Z+E — Mixed Zero-Rated & Exempt',
+  'Z+O':    'Z+O — Mixed Zero-Rated & Out-of-Scope',
+  'E+O':    'E+O — Mixed Exempt & Out-of-Scope',
+  'Z+E+O':  'Z+E+O — Zero-Rated, Exempt & Out-of-Scope',
+};
+
+function getValidVatOptions(doc, txn) {
+  if (!doc || !txn) return { single: [], multi: [] };
+  const isMargin = txn[2] === '1';
+
+  if (isMargin) {
+    if (['480','81'].includes(doc)) return { single: [], multi: [] };
+    return { single: ['N'], multi: [] };
+  }
+
+  if (['380','381'].includes(doc)) {
+    return {
+      single: ['S','AE','Z'],
+      multi:  ['S+Z','S+AE','AE+Z','S+AE+Z'],
+    };
+  }
+  if (['389','261'].includes(doc)) {
+    return {
+      single: ['S','AE','Z','E','O'],
+      multi:  ['S+Z','S+AE','S+E','S+O','AE+Z','Z+E','Z+O','S+AE+Z'],
+    };
+  }
+  if (['480','81'].includes(doc)) {
+    // 480/81 cannot be Deemed (01) or Summary (00010000 → txn[3])
+    if (txn[1] === '1' || txn[3] === '1') return { single: [], multi: [] };
+    return {
+      single: ['Z','E','O'],
+      multi:  ['Z+E','Z+O','E+O','Z+E+O'],
+    };
+  }
+  return { single: [], multi: [] };
+}
+
+function onDocTxnChange() {
+  updateVatOptions();
+  update();
+}
+
+function updateVatOptions() {
+  const doc = document.getElementById('selDoc').value;
+  const txn = document.getElementById('selTxn').value;
+  const sel = document.getElementById('selVat');
+  const prev = sel.value;
+
+  sel.innerHTML = '';
+  const ph = document.createElement('option');
+  ph.value = '';
+  ph.textContent = (doc && txn) ? '— Select VAT category —' : '— Select doc type & transaction first —';
+  sel.appendChild(ph);
+
+  if (!doc || !txn) return;
+
+  const { single, multi } = getValidVatOptions(doc, txn);
+
+  if (!single.length && !multi.length) {
+    const o = document.createElement('option');
+    o.value = ''; o.textContent = '— No valid VAT for this combination —'; o.disabled = true;
+    sel.appendChild(o);
+    return;
+  }
+
+  if (single.length) {
+    const sg = document.createElement('optgroup');
+    sg.label = '── Single Category ──';
+    single.forEach(code => {
+      const o = document.createElement('option');
+      o.value = code; o.textContent = VAT_LABELS[code];
+      sg.appendChild(o);
+    });
+    sel.appendChild(sg);
+  }
+
+  if (multi.length) {
+    const mg = document.createElement('optgroup');
+    mg.label = '── Multi-VAT Combinations ──';
+    multi.forEach(code => {
+      const o = document.createElement('option');
+      o.value = code; o.textContent = VAT_LABELS[code];
+      mg.appendChild(o);
+    });
+    sel.appendChild(mg);
+  }
+
+  const all = [...single, ...multi];
+  if (prev && all.includes(prev)) sel.value = prev;
+}
+
+// ====================================================
+// FIELD DEFINITIONS
+// ====================================================
+// Each field: { id, name, path, note, card }
+// card: M = mandatory always, C = conditional, O = optional
+// sections group fields logically
+
+const SECTIONS = [
+  {
+    label: "Document Header",
+    fields: [
+      { id:"IBT-024", name:"Specification Identifier", path:"cbc:CustomizationID", note:"urn:peppol:pint:billing-1@ae-1 or selfbilling-1@ae-1", card:"M" },
+      { id:"IBT-023", name:"Business Process Type", path:"cbc:ProfileID", note:"urn:peppol:bis:billing or urn:peppol:bis:selfbilling", card:"M" },
+      { id:"BTAE-02", name:"Transaction Type Code", path:"cbc:ProfileExecutionID", note:"8-bit binary string e.g. 00000000", card:"M", btae:true },
+      { id:"IBT-001", name:"Invoice Number", path:"cbc:ID", note:"Unique invoice identifier", card:"M" },
+      { id:"IBT-002", name:"Invoice Issue Date", path:"cbc:IssueDate", note:"Format YYYY-MM-DD", card:"M" },
+      { id:"IBT-003", name:"Invoice Type Code", path:"cbc:InvoiceTypeCode | cbc:CreditNoteTypeCode", note:"380 / 381 / 389 / 261 / 480 / 81", card:"M" },
+      { id:"IBT-005", name:"Invoice Currency Code", path:"cbc:DocumentCurrencyCode", note:"ISO 4217 currency code e.g. AED, USD", card:"M" },
+      { id:"IBT-007", name:"VAT Point Date", path:"cbc:TaxPointDate", note:"Must be before issue date. NOT used on credit notes (381, 81, 261).", card:"C", cond:"doc_not_creditnote" },
+      { id:"IBT-009", name:"Payment Due Date", path:"cbc:DueDate", note:"Mandatory when PayableAmount > 0, except credit notes and Deemed Supply.", card:"C", cond:"due_date" },
+      { id:"IBT-022", name:"Invoice Note", path:"cbc:Note", note:"Free text note; max once", card:"O" },
+      { id:"IBT-006", name:"Tax Currency Code", path:"cbc:TaxCurrencyCode", note:"Required when invoice currency ≠ AED. Must be AED.", card:"C", cond:"non_aed" },
+    ]
+  },
+  {
+    label: "References",
+    fields: [
+      { id:"IBT-010", name:"Buyer Reference", path:"cbc:BuyerReference", note:"Mandatory if no OrderReference present", card:"C", cond:"buyer_ref" },
+      { id:"IBG-01", name:"Preceding Invoice Reference", path:"cac:BillingReference / cac:InvoiceDocumentReference / cbc:ID", note:"Required on credit notes (except reason code VD)", card:"C", cond:"credit_ref" },
+      { id:"BTAE-03", name:"Credit Note Reason Code", path:"cac:DiscrepancyResponse / cbc:ResponseCode", note:"Mandatory for ALL credit notes (381, 261, 81). Use VD for volume discount.", card:"C", cond:"is_creditnote", btae:true },
+      { id:"IBT-013", name:"Purchase Order Reference", path:"cac:OrderReference / cbc:ID", note:"Conditional — if buyer issued a PO", card:"C", cond:"order_ref" },
+      { id:"IBG-14", name:"Invoicing Period", path:"cac:InvoicePeriod / cbc:StartDate + cbc:EndDate", note:"Mandatory for Summary Invoice (BTAE-02 = XXX1XXXX)", card:"C", cond:"summary_inv" },
+    ]
+  },
+  {
+    label: "Seller (AccountingSupplierParty)",
+    fields: [
+      { id:"IBT-034", name:"Seller Endpoint ID", path:"cac:AccountingSupplierParty / cac:Party / cbc:EndpointID", note:"schemeID = 0235; value = TIN (10-digit starting with 1)", card:"M" },
+      { id:"IBT-028", name:"Seller Trading Name", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyName / cbc:Name", note:"Optional trading/business name", card:"O" },
+      { id:"IBT-035", name:"Seller Street Name", path:"cac:AccountingSupplierParty / cac:Party / cac:PostalAddress / cbc:StreetName", note:"Mandatory", card:"M" },
+      { id:"IBT-037", name:"Seller City", path:"cac:AccountingSupplierParty / cac:Party / cac:PostalAddress / cbc:CityName", note:"Mandatory", card:"M" },
+      { id:"IBT-039", name:"Seller Emirate Code", path:"cac:AccountingSupplierParty / cac:Party / cac:PostalAddress / cbc:CountrySubentity", note:"One of: AUH DXB SHJ UAQ FUJ AJM RAK", card:"M" },
+      { id:"IBT-040", name:"Seller Country Code", path:"cac:AccountingSupplierParty / cac:Party / cac:PostalAddress / cac:Country / cbc:IdentificationCode", note:"AE for UAE", card:"M" },
+      { id:"IBT-031", name:"Seller VAT TRN", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyTaxScheme[VAT] / cbc:CompanyID", note:"15-digit UAE TRN; at least IBT-031 or IBT-032 required", card:"C", cond:"seller_vat" },
+      { id:"IBT-032", name:"Seller TIN", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyTaxScheme[TIN] / cbc:CompanyID", note:"Tax Identification Number; at least one of TRN or TIN required", card:"C", cond:"seller_vat" },
+      { id:"IBT-027", name:"Seller Legal Name", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyLegalEntity / cbc:RegistrationName", note:"Official registered name", card:"M" },
+      { id:"IBT-030", name:"Seller Legal Reg. ID", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyLegalEntity / cbc:CompanyID", note:"schemeAgencyID = TL/EID/PAS/CD per BTAE-15", card:"M" },
+      { id:"BTAE-15", name:"Seller Reg. ID Type", path:"cac:AccountingSupplierParty / cac:Party / cac:PartyLegalEntity / cbc:CompanyID @schemeAgencyID", note:"TL=Trade License, EID=Emirates ID, PAS=Passport, CD=Commercial Docs", card:"M", btae:true },
+    ]
+  },
+  {
+    label: "Buyer (AccountingCustomerParty)",
+    fields: [
+      { id:"IBT-049", name:"Buyer Endpoint ID", path:"cac:AccountingCustomerParty / cac:Party / cbc:EndpointID", note:"schemeID = 0235; value = TIN (10-digit starting with 1)", card:"M" },
+      { id:"IBT-045", name:"Buyer Trading Name", path:"cac:AccountingCustomerParty / cac:Party / cac:PartyName / cbc:Name", note:"Optional", card:"O" },
+      { id:"IBT-050", name:"Buyer Street Name", path:"cac:AccountingCustomerParty / cac:Party / cac:PostalAddress / cbc:StreetName", note:"Optional but recommended", card:"O" },
+      { id:"IBT-052", name:"Buyer City", path:"cac:AccountingCustomerParty / cac:Party / cac:PostalAddress / cbc:CityName", note:"Optional but recommended", card:"O" },
+      { id:"IBT-055", name:"Buyer Country Code", path:"cac:AccountingCustomerParty / cac:Party / cac:PostalAddress / cac:Country / cbc:IdentificationCode", note:"Mandatory", card:"M" },
+      { id:"IBT-044", name:"Buyer Legal Name", path:"cac:AccountingCustomerParty / cac:Party / cac:PartyLegalEntity / cbc:RegistrationName", note:"Official registered name", card:"M" },
+      { id:"IBT-047", name:"Buyer Legal Reg. ID", path:"cac:AccountingCustomerParty / cac:Party / cac:PartyLegalEntity / cbc:CompanyID", note:"schemeAgencyID = TL/EID/PAS/CD per BTAE-16", card:"M" },
+      { id:"IBT-048", name:"Buyer VAT TRN", path:"cac:AccountingCustomerParty / cac:Party / cac:PartyTaxScheme / cbc:CompanyID", note:"Mandatory when VAT = AE (Reverse Charge). Recommended otherwise.", card:"C", cond:"vat_ae" },
+      { id:"BTAE-01", name:"Beneficiary ID", path:"cac:AccountingCustomerParty / cac:Party / cac:PartyIdentification / cbc:ID", note:"Mandatory when BTAE-02 = 1XXXXXXX (Free Trade Zone)", card:"C", cond:"is_ftz", btae:true },
+      { id:"BTAE-14", name:"Principle ID (Agent)", path:"cac:SellerSupplierParty / cac:Party / cac:PartyIdentification / cbc:ID", note:"Mandatory when BTAE-02 = XXXXX1XX (Disclosed Agent Billing)", card:"C", cond:"is_agent", btae:true },
+    ]
+  },
+  {
+    label: "Delivery (cac:Delivery)",
+    fields: [
+      { id:"IBT-072", name:"Actual Delivery Date", path:"cac:Delivery / cbc:ActualDeliveryDate", note:"Optional", card:"O" },
+      { id:"IBT-075", name:"Deliver-to Street", path:"cac:Delivery / cac:DeliveryLocation / cac:Address / cbc:StreetName", note:"Mandatory for E-commerce (BTAE-02=XXXXXX1X) and Exports (BTAE-02=XXXXXXX1)", card:"C", cond:"delivery_addr" },
+      { id:"IBT-077", name:"Deliver-to City", path:"cac:Delivery / cac:DeliveryLocation / cac:Address / cbc:CityName", note:"Mandatory for E-commerce and Exports", card:"C", cond:"delivery_addr" },
+      { id:"IBT-079", name:"Deliver-to Emirate / Subdivision", path:"cac:Delivery / cac:DeliveryLocation / cac:Address / cbc:CountrySubentity", note:"Mandatory for E-commerce and Exports", card:"C", cond:"delivery_addr" },
+      { id:"IBT-080", name:"Deliver-to Country Code", path:"cac:Delivery / cac:DeliveryLocation / cac:Address / cac:Country / cbc:IdentificationCode", note:"For Exports: must NOT be AE", card:"C", cond:"delivery_addr" },
+      { id:"BTAE-23", name:"Deliver-to Party ID", path:"cac:Delivery / cac:DeliveryParty / cac:PartyIdentification / cbc:ID", note:"TRN/TIN of recipient for triangular sales", card:"O", btae:true },
+    ]
+  },
+  {
+    label: "Export-specific",
+    fields: [
+      { id:"BTAE-21", name:"Customs Reference Number", path:"cac:AdditionalDocumentReference[TypeCode=ECN] / cbc:ID", note:"For export transactions", card:"C", cond:"is_export", btae:true },
+      { id:"BTAE-22", name:"Incoterms", path:"cac:AdditionalDocumentReference[TypeCode=AWB] / cbc:ID", note:"For export transactions", card:"C", cond:"is_export", btae:true },
+    ]
+  },
+  {
+    label: "Payment",
+    fields: [
+      { id:"IBT-081", name:"Payment Means Code", path:"cac:PaymentMeans / cbc:PaymentMeansCode", note:"Mandatory EXCEPT for credit notes (381, 261, 81) and Deemed Supply. Common: 30 credit transfer, 48 bank card.", card:"C", cond:"payment_means" },
+      { id:"IBT-084", name:"Payment Account ID (IBAN)", path:"cac:PaymentMeans / cac:PayeeFinancialAccount / cbc:ID", note:"Mandatory when PaymentMeansCode = 30 (credit transfer)", card:"C", cond:"credit_transfer" },
+      { id:"IBT-086", name:"Payment Card PAN", path:"cac:PaymentMeans / cac:CardAccount / cbc:PrimaryAccountNumberID", note:"Last 4–6 digits. Mandatory when PaymentMeansCode = 48/54/55.", card:"C", cond:"card_payment" },
+      { id:"BTAE-04", name:"Currency Exchange Rate", path:"cac:TaxExchangeRate / cbc:CalculationRate", note:"Mandatory when invoice currency ≠ AED", card:"C", cond:"non_aed", btae:true },
+    ]
+  },
+  {
+    label: "Document-level Allowances & Charges",
+    fields: [
+      { id:"IBT-092", name:"Allowance Amount", path:"cac:AllowanceCharge[ChargeIndicator=false] / cbc:Amount", note:"VAT category code required. N NOT allowed.", card:"C", cond:"has_allowance" },
+      { id:"IBT-095", name:"Allowance VAT Category Code", path:"cac:AllowanceCharge[false] / cac:TaxCategory / cbc:ID", note:"Must match line VAT category. N not allowed.", card:"C", cond:"has_allowance" },
+      { id:"IBT-099", name:"Charge Amount", path:"cac:AllowanceCharge[ChargeIndicator=true] / cbc:Amount", note:"VAT category required. N NOT allowed.", card:"C", cond:"has_charge" },
+      { id:"IBT-102", name:"Charge VAT Category Code", path:"cac:AllowanceCharge[true] / cac:TaxCategory / cbc:ID", note:"Must match line VAT category. N not allowed.", card:"C", cond:"has_charge" },
+    ]
+  },
+  {
+    label: "Tax Total (cac:TaxTotal)",
+    fields: [
+      { id:"IBT-110", name:"Invoice Total VAT Amount", path:"cac:TaxTotal / cbc:TaxAmount @currencyID=DocCurrency", note:"In document currency. Sum of all TaxSubtotal/TaxAmount.", card:"M" },
+      { id:"IBT-111", name:"VAT Amount in AED", path:"cac:TaxTotal[2] / cbc:TaxAmount @currencyID=AED", note:"Second TaxTotal block. Required when document currency ≠ AED.", card:"C", cond:"non_aed" },
+      { id:"IBT-116", name:"VAT Taxable Amount", path:"cac:TaxTotal / cac:TaxSubtotal / cbc:TaxableAmount", note:"One subtotal per distinct VAT code + rate combination", card:"M" },
+      { id:"IBT-117", name:"VAT Category Tax Amount", path:"cac:TaxTotal / cac:TaxSubtotal / cbc:TaxAmount", note:"= 0 for AE, E, O, Z, N", card:"M" },
+      { id:"IBT-118", name:"VAT Category Code (Breakdown)", path:"cac:TaxTotal / cac:TaxSubtotal / cac:TaxCategory / cbc:ID", note:"S, AE, Z, E, O or N", card:"M" },
+      { id:"IBT-119", name:"VAT Category Rate", path:"cac:TaxTotal / cac:TaxSubtotal / cac:TaxCategory / cbc:Percent", note:"Required for S (5%), N (>0). NOT provided for E, O. Must be 0 for Z.", card:"C", cond:"vat_rate" },
+      { id:"IBT-120", name:"Tax Exemption Reason", path:"cac:TaxTotal / cac:TaxSubtotal / cac:TaxCategory / cbc:TaxExemptionReason", note:"Required when VAT = E (Exempt). Reference UAE law.", card:"C", cond:"vat_e" },
+    ]
+  },
+  {
+    label: "Monetary Totals (cac:LegalMonetaryTotal)",
+    fields: [
+      { id:"IBT-106", name:"Sum of Line Net Amounts", path:"cac:LegalMonetaryTotal / cbc:LineExtensionAmount", note:"Σ InvoiceLine/LineExtensionAmount", card:"M" },
+      { id:"IBT-109", name:"Invoice Total excl. VAT", path:"cac:LegalMonetaryTotal / cbc:TaxExclusiveAmount", note:"= LineExtension + Charges - Allowances", card:"M" },
+      { id:"IBT-112", name:"Invoice Total incl. VAT", path:"cac:LegalMonetaryTotal / cbc:TaxInclusiveAmount", note:"= TaxExclusive + TaxAmount", card:"M" },
+      { id:"IBT-115", name:"Amount Due for Payment", path:"cac:LegalMonetaryTotal / cbc:PayableAmount", note:"= TaxInclusive - Prepaid + Rounding", card:"M" },
+      { id:"IBT-107", name:"Allowances Total", path:"cac:LegalMonetaryTotal / cbc:AllowanceTotalAmount", note:"Conditional — when doc-level allowances present", card:"C", cond:"has_allowance" },
+      { id:"IBT-108", name:"Charges Total", path:"cac:LegalMonetaryTotal / cbc:ChargeTotalAmount", note:"Conditional — when doc-level charges present", card:"C", cond:"has_charge" },
+      { id:"BTAE-20", name:"Total with VAT in AED", path:"cac:LegalMonetaryTotal [TaxCurrencyCode=AED] + cac:TaxTotal / cbc:TaxAmount", note:"Required when invoice currency ≠ AED and tax currency = AED", card:"C", cond:"non_aed", btae:true },
+    ]
+  },
+  {
+    label: "Invoice Line (cac:InvoiceLine / cac:CreditNoteLine)",
+    fields: [
+      { id:"IBT-126", name:"Line ID", path:"cac:InvoiceLine / cbc:ID", note:"Unique sequential identifier per line", card:"M" },
+      { id:"IBT-129", name:"Invoiced Quantity", path:"cac:InvoiceLine / cbc:InvoicedQuantity @unitCode", note:"unitCode from UNECE Rec. 20/21 e.g. H87, KGM", card:"M" },
+      { id:"IBT-131", name:"Line Net Amount", path:"cac:InvoiceLine / cbc:LineExtensionAmount", note:"Net = (Price ÷ BaseQty × Qty) + LineCharges − LineAllowances", card:"M" },
+      { id:"IBT-154", name:"Item Description", path:"cac:InvoiceLine / cac:Item / cbc:Description", note:"Mandatory (ibr-125-ae)", card:"M" },
+      { id:"IBT-153", name:"Item Name", path:"cac:InvoiceLine / cac:Item / cbc:Name", note:"Mandatory", card:"M" },
+      { id:"IBT-151", name:"Item VAT Category Code", path:"cac:InvoiceLine / cac:Item / cac:ClassifiedTaxCategory / cbc:ID", note:"S, AE, Z, E, O, N. Always required.", card:"M" },
+      { id:"IBT-152", name:"Item VAT Rate", path:"cac:InvoiceLine / cac:Item / cac:ClassifiedTaxCategory / cbc:Percent", note:"Required for S and N. Not for E/O. Must be 0 for Z.", card:"C", cond:"vat_rate" },
+      { id:"IBT-146", name:"Item Net Price", path:"cac:InvoiceLine / cac:Price / cbc:PriceAmount", note:"Mandatory", card:"M" },
+      { id:"IBT-149", name:"Item Price Base Quantity", path:"cac:InvoiceLine / cac:Price / cbc:BaseQuantity", note:"Mandatory (ibr-126-ae)", card:"M" },
+      { id:"IBT-148", name:"Item Gross Price", path:"cac:InvoiceLine / cac:Price / cac:AllowanceCharge / cbc:BaseAmount", note:"Required when price discount is used (ibr-126-ae)", card:"M" },
+      { id:"BTAE-08", name:"VAT Line Amount (AED)", path:"cac:InvoiceLine / cac:ItemPriceExtension / cac:TaxTotal / cbc:TaxAmount", note:"Mandatory for all VAT categories except E. Always in AED.", card:"C", cond:"vat_not_eo", btae:true },
+      { id:"BTAE-10", name:"Line Amount Payable (AED)", path:"cac:InvoiceLine / cac:ItemPriceExtension / cbc:Amount", note:"Mandatory when line VAT info present. Always in AED.", card:"C", cond:"vat_not_eo", btae:true },
+      { id:"BTAE-24", name:"Batch Number", path:"cac:InvoiceLine / cac:Item / cac:AdditionalItemProperty[Name=BatchNumber] / cbc:Value", note:"Optional — for batch-tracked goods", card:"O", btae:true },
+    ]
+  }
+];
+
+// ====================================================
+// VALIDATION LOGIC
+// ====================================================
+function isValidCombination(doc, txn, vat) {
+  if (!doc || !txn || !vat) return { valid: null, msg: '' };
+  const vats = getVats(vat);
+
+  // N must be alone
+  if (vats.includes('N') && vats.length > 1)
+    return { valid: false, msg: 'VAT code N (Margin Scheme) cannot be mixed with other categories.' };
+
+  // Margin scheme → only N
+  if (txn[2] === '1' && !vats.includes('N'))
+    return { valid: false, msg: 'Profit Margin Scheme (XX1XXXXX) requires VAT code N only.' };
+
+  // N only valid with margin scheme
+  if (vats.includes('N') && txn[2] !== '1')
+    return { valid: false, msg: 'VAT code N is only valid with Profit Margin Scheme (XX1XXXXX).' };
+
+  // 480/81 → only E, O, Z
+  if ((doc === '480' || doc === '81') && vats.some(v => !['E','O','Z'].includes(v)))
+    return { valid: false, msg: `Doc type ${doc} only allows VAT codes E, O, Z.` };
+
+  // 480/81 cannot use Deemed Supply, Margin Scheme, Summary Invoice
+  if ((doc === '480' || doc === '81') && (txn[1]==='1' || txn[2]==='1' || txn[3]==='1'))
+    return { valid: false, msg: `Doc type ${doc} cannot be combined with Deemed Supply, Margin Scheme, or Summary Invoice.` };
+
+  // 380/381 cannot have only E/O
+  if ((doc === '380' || doc === '381') && vats.every(v => ['E','O'].includes(v)))
+    return { valid: false, msg: `Doc type ${doc} requires at least one non-E/non-O VAT line.` };
+
+  const multi = vats.length > 1;
+  return { valid: true, msg: `✓ Valid combination${multi ? ' · ' + vats.length + ' VAT categories' : ''} — showing required fields below` };
+}
+
+// ====================================================
+// CONDITIONAL FIELD EVALUATOR
+// ====================================================
+function evalCondition(cond, doc, txn, vat) {
+  const vats = getVats(vat);
+  if (!cond) return true;
+  switch(cond) {
+    case 'doc_not_creditnote': return !['381','81','261'].includes(doc);
+    case 'due_date': return !['381','81','261'].includes(doc) && txn[1] !== '1';
+    case 'is_creditnote': return ['381','261','81'].includes(doc);
+    case 'credit_ref': return ['381','261','81'].includes(doc);
+    case 'buyer_ref': return true;
+    case 'order_ref': return true;
+    case 'summary_inv': return txn[3] === '1';
+    case 'seller_vat': return true;
+    case 'vat_ae': return vats.includes('AE');
+    case 'is_ftz': return txn[0] === '1';
+    case 'is_agent': return txn[5] === '1';
+    case 'delivery_addr': return txn[6] === '1' || txn[7] === '1';
+    case 'is_export': return txn[7] === '1';
+    case 'non_aed': return true;
+    case 'payment_means': return !['381','261','81'].includes(doc) && txn[1] !== '1';
+    case 'credit_transfer': return true;
+    case 'card_payment': return true;
+    case 'has_allowance': return true;
+    case 'has_charge': return true;
+    case 'vat_rate': return vats.some(v => ['S','N','AE'].includes(v));
+    case 'vat_e': return vats.includes('E');
+    case 'vat_not_eo': return vats.some(v => !['E','O'].includes(v));
+    default: return true;
+  }
+}
+
+// ====================================================
+// RENDER
+// ====================================================
+function update() {
+  const doc = document.getElementById('selDoc').value;
+  const txn = document.getElementById('selTxn').value;
+  const vat = document.getElementById('selVat').value;
+
+  if (!doc || !txn || !vat) {
+    document.getElementById('valBar').className = 'validation-bar';
+    document.getElementById('fieldList').innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg><p>Select all three options above to see required fields</p></div>`;
+    document.getElementById('xmlContent').innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg><p>XML preview appears here</p></div>`;
+    document.getElementById('fieldCount').textContent = '';
+    return;
+  }
+
+  const { valid, msg } = isValidCombination(doc, txn, vat);
+  const bar = document.getElementById('valBar');
+  document.getElementById('valMsg').textContent = msg;
+  if (valid === true) bar.className = 'validation-bar valid';
+  else if (valid === false) { bar.className = 'validation-bar invalid'; renderInvalid(); return; }
+
+  renderFields(doc, txn, vat);
+  renderXml(doc, txn, vat);
+}
+
+function renderInvalid() {
+  document.getElementById('fieldList').innerHTML = `<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><p>Invalid combination — no fields to show</p></div>`;
+  document.getElementById('xmlContent').innerHTML = `<div class="empty-state"><p style="color:var(--red)">Invalid combination — select a valid Doc/Txn/VAT combination</p></div>`;
+  document.getElementById('fieldCount').textContent = '';
+}
+
+function pathHtml(path) {
+  return path.replace(/cac:/g, '<span class="cac">cac:</span>').replace(/cbc:/g, '<span class="cbc">cbc:</span>');
+}
+
+function renderFields(doc, txn, vat) {
+  let mCount = 0, cCount = 0;
+  let html = '';
+
+  for (const sec of SECTIONS) {
+    const visible = sec.fields.filter(f => {
+      if (f.card === 'O') return false; // omit pure optional from main view
+      return evalCondition(f.cond, doc, txn, vat);
+    });
+    if (!visible.length) continue;
+
+    html += `<div class="section">`;
+    html += `<div class="section-label">${sec.label}</div>`;
+    for (const f of visible) {
+      const cls = f.card === 'M' ? 'mandatory' : 'conditional';
+      if (f.card === 'M') mCount++;
+      else cCount++;
+      html += `<div class="field-row ${cls}">
+        <div class="field-id ${f.btae?'btae':''}">${f.id}</div>
+        <div class="field-body">
+          <div class="field-name">${f.name}</div>
+          <div class="field-path">${pathHtml(f.path)}</div>
+          ${f.note ? `<div class="field-note">${f.note}</div>` : ''}
+        </div>
+        <div class="cardinality ${f.card}">${f.card === 'M' ? 'Mandatory' : 'Conditional'}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Also show optional BTAE fields
+  let optHtml = '';
+  for (const sec of SECTIONS) {
+    for (const f of sec.fields) {
+      if (f.card === 'O' && f.btae) {
+        optHtml += `<div class="field-row optional">
+          <div class="field-id btae">${f.id}</div>
+          <div class="field-body">
+            <div class="field-name">${f.name}</div>
+            <div class="field-path">${pathHtml(f.path)}</div>
+            ${f.note ? `<div class="field-note">${f.note}</div>` : ''}
+          </div>
+          <div class="cardinality O">Optional</div>
+        </div>`;
+      }
+    }
+  }
+  if (optHtml) {
+    html += `<div class="section"><div class="section-label">UAE Optional Fields (BTAE)</div>${optHtml}</div>`;
+  }
+
+  document.getElementById('fieldList').innerHTML = html;
+  document.getElementById('fieldCount').textContent = `${mCount} mandatory · ${cCount} conditional`;
+}
+
+function renderXml(doc, txn, vat) {
+  const vats   = getVats(vat);
+  const isCN   = ['381','261','81'].includes(doc);
+  const isSB   = ['389','261'].includes(doc);
+  const typeTag = isCN ? 'CreditNote' : 'Invoice';
+  const lineTag = isCN ? 'CreditNoteLine' : 'InvoiceLine';
+  const qtyTag  = isCN ? 'CreditedQuantity' : 'InvoicedQuantity';
+  const typeCode = isCN ? 'CreditNoteTypeCode' : 'InvoiceTypeCode';
+  const custId  = isSB ? 'urn:peppol:pint:selfbilling-1@ae-1' : 'urn:peppol:pint:billing-1@ae-1';
+  const profId  = isSB ? 'urn:peppol:bis:selfbilling' : 'urn:peppol:bis:billing';
+  const hasAE   = vats.includes('AE');
+
+  // Per-category financials — 1000 AED taxable per line
+  const LINE = 1000;
+  function catTax(cat)  { return cat === 'S' ? 50 : 0; }
+  function catRate(cat) { return (cat === 'S' || cat === 'N' || cat === 'AE') ? '5' : '0'; }
+  function noRate(cat)  { return cat === 'E' || cat === 'O'; }
+  function noIPE(cat)   { return cat === 'E' || cat === 'O'; }
+
+  const totalLine = vats.length * LINE;
+  const totalTax  = vats.reduce((s, c) => s + catTax(c), 0);
+  const totalIncl = totalLine + totalTax;
+
+  const t  = (s) => `<span class="xml-tag">${s}</span>`;
+  const a  = (s) => `<span class="xml-attr">${s}</span>`;
+  const v  = (s) => `<span class="xml-val">${s}</span>`;
+  const c  = (s) => `<span class="xml-comment">${s}</span>`;
+  const m  = (s) => `<span class="xml-m">${s}</span>`;
+  const cd = (s) => `<span class="xml-c">${s}</span>`;
+
+  // ── TaxSubtotals (one per VAT category) ──
+  const subtotals = vats.map(cat => `    ${m(t('<cac:TaxSubtotal>'))}
+      ${m(t('<cbc:TaxableAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(LINE))}${m(t('</cbc:TaxableAmount>'))} ${c('<!-- IBT-116 -->')}
+      ${m(t('<cbc:TaxAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(catTax(cat)))}${m(t('</cbc:TaxAmount>'))} ${c('<!-- IBT-117 -->')}
+      ${m(t('<cac:TaxCategory>'))}
+        ${m(t('<cbc:ID>'))}${v(cat)}${m(t('</cbc:ID>'))} ${c('<!-- IBT-118 -->')}
+        ${!noRate(cat) ? `${m(t('<cbc:Percent>'))}${v(catRate(cat))}${m(t('</cbc:Percent>'))}` : c('<!-- no Percent for '+cat+' -->')}
+        ${cat==='E' ? `${cd(t('<cbc:TaxExemptionReasonCode>'))}${v('DL8.46.1')}${cd(t('</cbc:TaxExemptionReasonCode>'))} ${c('<!-- E mandatory -->')}` : ''}
+        ${m(t('<cac:TaxScheme><cbc:ID>'))}${v('VAT')}${m(t('</cbc:ID></cac:TaxScheme>'))}
+      ${m(t('</cac:TaxCategory>'))}
+    ${m(t('</cac:TaxSubtotal>'))}`).join('\n');
+
+  // ── Invoice Lines (one per VAT category) ──
+  const lines = vats.map((cat, i) => {
+    const ta = catTax(cat);
+    const lineIncl = LINE + ta;
+    return `  ${m(t('<cac:'+lineTag+'>'))}
+    ${m(t('<cbc:ID>'))}${v(String(i+1))}${m(t('</cbc:ID>'))} ${c('<!-- IBT-126 -->')}
+    ${m(t('<cbc:'+qtyTag+' '))}${a('unitCode=')}${v('"H87"')}${m(t('>'))}${v('10')}${m(t('</cbc:'+qtyTag+'>'))} ${c('<!-- IBT-129 -->')}
+    ${m(t('<cbc:LineExtensionAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(LINE))}${m(t('</cbc:LineExtensionAmount>'))} ${c('<!-- IBT-131 -->')}
+    ${m(t('<cac:Item>'))}
+      ${m(t('<cbc:Description>'))}${v(cat+'-rated supply')}${m(t('</cbc:Description>'))} ${c('<!-- IBT-154 -->')}
+      ${m(t('<cbc:Name>'))}${v('Item '+(i+1)+' ['+cat+']')}${m(t('</cbc:Name>'))} ${c('<!-- IBT-153 -->')}
+      ${m(t('<cac:ClassifiedTaxCategory>'))}
+        ${m(t('<cbc:ID>'))}${v(cat)}${m(t('</cbc:ID>'))} ${c('<!-- IBT-151 -->')}
+        ${!noRate(cat) ? `${m(t('<cbc:Percent>'))}${v(catRate(cat))}${m(t('</cbc:Percent>'))} ${c('<!-- IBT-152 -->')}` : c('<!-- no Percent for '+cat+' -->')}
+        ${m(t('<cac:TaxScheme><cbc:ID>'))}${v('VAT')}${m(t('</cbc:ID></cac:TaxScheme>'))}
+      ${m(t('</cac:ClassifiedTaxCategory>'))}
+    ${m(t('</cac:Item>'))}
+    ${m(t('<cac:Price>'))}
+      ${m(t('<cbc:PriceAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v('100.00')}${m(t('</cbc:PriceAmount>'))} ${c('<!-- IBT-146 -->')}
+      ${m(t('<cbc:BaseQuantity '))}${a('unitCode=')}${v('"H87"')}${m(t('>'))}${v('1')}${m(t('</cbc:BaseQuantity>'))} ${c('<!-- IBT-149 -->')}
+      ${m(t('<cac:AllowanceCharge>'))}
+        ${m(t('<cbc:ChargeIndicator>'))}${v('false')}${m(t('</cbc:ChargeIndicator>'))}
+        ${m(t('<cbc:Amount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v('0.00')}${m(t('</cbc:Amount>'))}
+        ${m(t('<cbc:BaseAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v('100.00')}${m(t('</cbc:BaseAmount>'))} ${c('<!-- IBT-148 -->')}
+      ${m(t('</cac:AllowanceCharge>'))}
+    ${m(t('</cac:Price>'))}
+${!noIPE(cat) ? `    ${cd(t('<cac:ItemPriceExtension>'))}
+      ${cd(t('<cbc:Amount '))}${a('currencyID=')}${v('"AED"')}${cd(t('>'))}${v(f(lineIncl))}${cd(t('</cbc:Amount>'))} ${c('<!-- BTAE-10 -->')}
+      ${cd(t('<cac:TaxTotal><cbc:TaxAmount '))}${a('currencyID=')}${v('"AED"')}${cd(t('>'))}${v(f(ta))}${cd(t('</cbc:TaxAmount></cac:TaxTotal>'))} ${c('<!-- BTAE-08 -->')}
+    ${cd(t('</cac:ItemPriceExtension>'))}` : c('    <!-- BTAE-08/10 not required for '+cat+' -->')}
+  ${m(t('</cac:'+lineTag+'>'))}`;
+  }).join('\n\n');
+
+  let xml = `${c('<!-- PINT AE · Doc:'+doc+' · Txn:'+txn+' · VAT:'+vat+' -->')}
+${t('<'+typeTag+'>')}
+  ${m(t('<cbc:CustomizationID>'))}${v(custId)}${m(t('</cbc:CustomizationID>'))} ${c('<!-- IBT-024 M -->')}
+  ${m(t('<cbc:ProfileID>'))}${v(profId)}${m(t('</cbc:ProfileID>'))} ${c('<!-- IBT-023 M -->')}
+  ${m(t('<cbc:ProfileExecutionID>'))}${v(txn)}${m(t('</cbc:ProfileExecutionID>'))} ${c('<!-- BTAE-02 M -->')}
+  ${m(t('<cbc:ID>'))}${v('INV-2025-001')}${m(t('</cbc:ID>'))} ${c('<!-- IBT-001 M -->')}
+  ${m(t('<cbc:IssueDate>'))}${v('2025-06-01')}${m(t('</cbc:IssueDate>'))} ${c('<!-- IBT-002 M -->')}
+${!isCN ? `  ${cd(t('<cbc:TaxPointDate>'))}${v('2025-05-31')}${cd(t('</cbc:TaxPointDate>'))} ${c('<!-- IBT-007 C: not on credit notes -->')}` : `  ${c('<!-- IBT-007 NOT ALLOWED on credit notes -->')}`}
+${!['381','261','81'].includes(doc) && txn[1]!=='1' ? `  ${m(t('<cbc:DueDate>'))}${v('2025-06-15')}${m(t('</cbc:DueDate>'))} ${c('<!-- IBT-009 M when payable > 0 -->')}` : `  ${c('<!-- IBT-009 not required for credit notes / deemed supply -->')}`}
+  ${m(t('<cbc:'+typeCode+'>'))}${v(doc)}${m(t('</cbc:'+typeCode+'>'))} ${c('<!-- IBT-003 M -->')}
+  ${m(t('<cbc:DocumentCurrencyCode>'))}${v('AED')}${m(t('</cbc:DocumentCurrencyCode>'))} ${c('<!-- IBT-005 M -->')}
+  ${m(t('<cbc:BuyerReference>'))}${v('PO-2025-100')}${m(t('</cbc:BuyerReference>'))} ${c('<!-- IBT-010 C -->')}
+${isCN ? `
+  ${cd(t('<cac:DiscrepancyResponse>'))} ${c('<!-- BTAE-03 M: mandatory for all credit notes -->')}
+    ${cd(t('<cbc:ResponseCode>'))}${v('CD')}${cd(t('</cbc:ResponseCode>'))}
+  ${cd(t('</cac:DiscrepancyResponse>'))}
+  ${cd(t('<cac:BillingReference>'))} ${c('<!-- IBG-01 C: preceding invoice -->')}
+    ${cd(t('<cac:InvoiceDocumentReference>'))}
+      ${cd(t('<cbc:ID>'))}${v('INV-2025-000')}${cd(t('</cbc:ID>'))}
+    ${cd(t('</cac:InvoiceDocumentReference>'))}
+  ${cd(t('</cac:BillingReference>'))}` : ''}
+${txn[3]==='1' ? `
+  ${cd(t('<cac:InvoicePeriod>'))} ${c('<!-- IBG-14 C: mandatory for Summary Invoice -->')}
+    ${cd(t('<cbc:StartDate>'))}${v('2025-05-01')}${cd(t('</cbc:StartDate>'))}
+    ${cd(t('<cbc:EndDate>'))}${v('2025-05-31')}${cd(t('</cbc:EndDate>'))}
+  ${cd(t('</cac:InvoicePeriod>'))}` : ''}
+
+  ${c('<!-- ═══ SELLER ════════════════════════════════════ -->')}
+  ${m(t('<cac:AccountingSupplierParty>'))}
+    ${m(t('<cac:Party>'))}
+      ${m(t('<cbc:EndpointID '))}${a('schemeID=')}${v('"0235"')}${m(t('>'))}${v('1987654321')}${m(t('</cbc:EndpointID>'))} ${c('<!-- IBT-034 M -->')}
+      ${m(t('<cac:PostalAddress>'))}
+        ${m(t('<cbc:StreetName>'))}${v('Main Street')}${m(t('</cbc:StreetName>'))} ${c('<!-- IBT-035 M -->')}
+        ${m(t('<cbc:CityName>'))}${v('Dubai')}${m(t('</cbc:CityName>'))} ${c('<!-- IBT-037 M -->')}
+        ${m(t('<cbc:CountrySubentity>'))}${v('DXB')}${m(t('</cbc:CountrySubentity>'))} ${c('<!-- IBT-039 M -->')}
+        ${m(t('<cac:Country><cbc:IdentificationCode>'))}${v('AE')}${m(t('</cbc:IdentificationCode></cac:Country>'))}
+      ${m(t('</cac:PostalAddress>'))}
+      ${m(t('<cac:PartyTaxScheme>'))} ${c('<!-- IBT-031 M: VAT TRN -->')}
+        ${m(t('<cbc:CompanyID>'))}${v('198765432102003')}${m(t('</cbc:CompanyID>'))}
+        ${m(t('<cac:TaxScheme><cbc:ID>'))}${v('VAT')}${m(t('</cbc:ID></cac:TaxScheme>'))}
+      ${m(t('</cac:PartyTaxScheme>'))}
+      ${m(t('<cac:PartyLegalEntity>'))}
+        ${m(t('<cbc:RegistrationName>'))}${v('Seller Legal Name LLC')}${m(t('</cbc:RegistrationName>'))} ${c('<!-- IBT-027 M -->')}
+        ${m(t('<cbc:CompanyID '))}${a('schemeAgencyID=')}${v('"TL"')}${m(t('>'))}${v('112345678900003')}${m(t('</cbc:CompanyID>'))} ${c('<!-- IBT-030+BTAE-15 M -->')}
+      ${m(t('</cac:PartyLegalEntity>'))}
+    ${m(t('</cac:Party>'))}
+  ${m(t('</cac:AccountingSupplierParty>'))}
+
+  ${c('<!-- ═══ BUYER ════════════════════════════════════ -->')}
+  ${m(t('<cac:AccountingCustomerParty>'))}
+    ${m(t('<cac:Party>'))}
+      ${m(t('<cbc:EndpointID '))}${a('schemeID=')}${v('"0235"')}${m(t('>'))}${v('1345678901')}${m(t('</cbc:EndpointID>'))} ${c('<!-- IBT-049 M -->')}
+      ${m(t('<cac:PostalAddress><cac:Country><cbc:IdentificationCode>'))}${v('AE')}${m(t('</cbc:IdentificationCode></cac:Country></cac:PostalAddress>'))} ${c('<!-- IBT-055 M -->')}
+${hasAE ? `      ${cd(t('<cac:PartyTaxScheme>'))} ${c('<!-- IBT-048 M: AE present → Buyer VAT TRN mandatory -->')}
+        ${cd(t('<cbc:CompanyID>'))}${v('134567890123003')}${cd(t('</cbc:CompanyID>'))}
+        ${cd(t('<cac:TaxScheme><cbc:ID>'))}${v('VAT')}${cd(t('</cbc:ID></cac:TaxScheme>'))}
+      ${cd(t('</cac:PartyTaxScheme>'))}` : `      ${c('<!-- IBT-048 C: Buyer VAT TRN (recommended) -->')}`}
+      ${m(t('<cac:PartyLegalEntity>'))}
+        ${m(t('<cbc:RegistrationName>'))}${v('Buyer Legal Name')}${m(t('</cbc:RegistrationName>'))} ${c('<!-- IBT-044 M -->')}
+        ${m(t('<cbc:CompanyID '))}${a('schemeAgencyID=')}${v('"TL"')}${m(t('>'))}${v('112345679000001')}${m(t('</cbc:CompanyID>'))} ${c('<!-- IBT-047+BTAE-16 M -->')}
+      ${m(t('</cac:PartyLegalEntity>'))}
+    ${m(t('</cac:Party>'))}
+  ${m(t('</cac:AccountingCustomerParty>'))}
+${txn[0]==='1' ? `
+  ${cd(t('<cac:AccountingCustomerParty>'))} ${c('<!-- BTAE-01 Beneficiary ID – FTZ -->')}
+    ${cd(t('<cac:Party><cac:PartyIdentification><cbc:ID>'))}${v('BENE-12345')}${cd(t('</cbc:ID></cac:PartyIdentification></cac:Party>'))}
+  ${cd(t('</cac:AccountingCustomerParty>'))}` : ''}
+${txn[6]==='1'||txn[7]==='1' ? `
+  ${cd(t('<cac:Delivery>'))} ${c('<!-- Delivery addr mandatory for E-commerce/Exports -->')}
+    ${cd(t('<cac:DeliveryLocation><cac:Address>'))}
+      ${cd(t('<cbc:StreetName>'))}${v('Delivery Street')}${cd(t('</cbc:StreetName>'))} ${c('<!-- IBT-075 M -->')}
+      ${cd(t('<cbc:CityName>'))}${v('Dubai')}${cd(t('</cbc:CityName>'))} ${c('<!-- IBT-077 M -->')}
+      ${cd(t('<cbc:CountrySubentity>'))}${v('DXB')}${cd(t('</cbc:CountrySubentity>'))} ${c('<!-- IBT-079 M -->')}
+      ${cd(t('<cac:Country><cbc:IdentificationCode>'))}${v(txn[7]==='1'?'GB':'AE')}${cd(t('</cbc:IdentificationCode></cac:Country>'))} ${c(txn[7]==='1'?'<!-- IBT-080: NOT AE for exports -->':'')}
+    ${cd(t('</cac:Address></cac:DeliveryLocation>'))}
+  ${cd(t('</cac:Delivery>'))}` : ''}
+
+  ${c('<!-- ═══ PAYMENT ═════════════════════════════════ -->')}
+${!isCN && txn[1]!=='1' ? `  ${cd(t('<cac:PaymentMeans>'))} ${c('<!-- IBT-081 M except CN/Deemed Supply -->')}
+    ${cd(t('<cbc:PaymentMeansCode>'))}${v('30')}${cd(t('</cbc:PaymentMeansCode>'))}
+    ${cd(t('<cac:PayeeFinancialAccount><cbc:ID>'))}${v('AE070331234567890123456')}${cd(t('</cbc:ID></cac:PayeeFinancialAccount>'))} ${c('<!-- IBT-084 M for code 30 -->')}
+  ${cd(t('</cac:PaymentMeans>'))}` : `  ${c('<!-- Payment means not required for this combination -->')}`}
+
+  ${c('<!-- ═══ TAX TOTAL'+(vats.length>1 ? ' ('+vats.length+' subtotals — one per category)' : '')+' ═══════════════ -->')}
+  ${m(t('<cac:TaxTotal>'))}
+    ${m(t('<cbc:TaxAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(totalTax))}${m(t('</cbc:TaxAmount>'))} ${c('<!-- IBT-110 M -->')}
+${subtotals}
+  ${m(t('</cac:TaxTotal>'))}
+
+  ${c('<!-- ═══ MONETARY TOTALS ══════════════════════════ -->')}
+  ${m(t('<cac:LegalMonetaryTotal>'))}
+    ${m(t('<cbc:LineExtensionAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(totalLine))}${m(t('</cbc:LineExtensionAmount>'))} ${c('<!-- IBT-106 M -->')}
+    ${m(t('<cbc:TaxExclusiveAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(totalLine))}${m(t('</cbc:TaxExclusiveAmount>'))} ${c('<!-- IBT-109 M -->')}
+    ${m(t('<cbc:TaxInclusiveAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(totalIncl))}${m(t('</cbc:TaxInclusiveAmount>'))} ${c('<!-- IBT-112 M -->')}
+    ${m(t('<cbc:PayableAmount '))}${a('currencyID=')}${v('"AED"')}${m(t('>'))}${v(f(totalIncl))}${m(t('</cbc:PayableAmount>'))} ${c('<!-- IBT-115 M -->')}
+  ${m(t('</cac:LegalMonetaryTotal>'))}
+
+  ${c('<!-- ═══ INVOICE LINE'+(vats.length>1 ? 'S (one per VAT category)' : '')+' ═════════════════════════ -->')}
+${lines}
+${t('</'+typeTag+'>')}`;
+
+  document.getElementById('xmlContent').innerHTML = `<div class="xml-content">${xml}</div>`;
+}
+</script>
+</body>
+</html>

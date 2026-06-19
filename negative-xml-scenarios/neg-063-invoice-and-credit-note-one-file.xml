@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NEG-063: Invoice + CreditNote mixed in a single XML file — invalid UBL structure -->
+<Documents xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+           xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+    <cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+    <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+    <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
+    <cbc:ID>INV-2025-NEG-063</cbc:ID>
+    <cbc:IssueDate>2025-06-01</cbc:IssueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+  </Invoice>
+  <CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2">
+    <cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+    <cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+    <cbc:ProfileExecutionID>00000000</cbc:ProfileExecutionID>
+    <cbc:ID>CN-2025-NEG-063</cbc:ID>
+    <cbc:IssueDate>2025-06-01</cbc:IssueDate>
+    <cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
+    <cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+  </CreditNote>
+</Documents>

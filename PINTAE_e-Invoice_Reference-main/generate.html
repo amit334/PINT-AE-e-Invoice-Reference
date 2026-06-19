@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — XML / JSON Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0f14; --surface:#161920; --surface2:#1e2230; --surface3:#252b3b;
+  --border:#2a2f3d; --border2:#363c50;
+  --text:#e8ecf4; --text2:#8892a8; --text3:#545e74;
+  --accent:#4e9cf5; --green:#3ecf8e; --amber:#f5a623; --red:#f55a5a;
+  --purple:#a78bfa; --teal:#2dd4bf;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(78,156,245,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(78,156,245,0.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.page{position:relative;z-index:1;flex:1;max-width:960px;margin:0 auto;width:100%;padding:0 1.5rem 3rem}
+
+.header{padding:2rem 0 0;display:flex;align-items:center;gap:1rem}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text3);text-decoration:none;transition:color .15s}
+.back-link:hover{color:var(--text2)}
+.hd{width:1px;height:16px;background:var(--border2)}
+.ht{font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text3)}
+
+.hero{padding:2rem 0 1.5rem}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);border-radius:20px;padding:4px 14px;margin-bottom:1.1rem;letter-spacing:.05em}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(20px,3.5vw,30px);font-weight:600;letter-spacing:-.4px;margin-bottom:.6rem;background:linear-gradient(135deg,#e8ecf4 30%,#8892a8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero h1 span{background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:13px;color:var(--text2);line-height:1.65;max-width:620px}
+
+/* ── Form card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1rem}
+.card-head{padding:.85rem 1.25rem;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+.card-head .icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.card-head svg{width:14px;height:14px;stroke:currentColor}
+.card-head .lbl{font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.04em}
+.card-body{padding:1.25rem}
+
+.row{display:grid;gap:1rem;margin-bottom:1rem}
+.row-3{grid-template-columns:repeat(3,1fr)}
+.row-2{grid-template-columns:repeat(2,1fr)}
+.row-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:700px){.row-3,.row-4{grid-template-columns:1fr 1fr}.row-2{grid-template-columns:1fr}}
+@media(max-width:480px){.row-3,.row-4,.row-2{grid-template-columns:1fr}}
+.row:last-child{margin-bottom:0}
+
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-label{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+select,input[type=text]{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:7px 10px;outline:none;transition:border-color .15s;width:100%}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23545e74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:28px}
+select:focus,input:focus{border-color:var(--accent)}
+select option{background:#1e2230}
+input::placeholder{color:var(--text3)}
+
+/* VAT checkboxes */
+.vat-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.75rem}
+.vat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:7px;border:1.5px solid var(--border2);background:var(--surface2);cursor:pointer;transition:all .15s;user-select:none;font-size:12px;font-family:'IBM Plex Mono',monospace;font-weight:600}
+.vat-chip:hover:not(.disabled){border-color:var(--text2);background:var(--surface3)}
+.vat-chip.checked{border-color:var(--accent);background:rgba(78,156,245,.1);color:var(--accent)}
+.vat-chip.disabled{opacity:.3;cursor:not-allowed}
+.vat-chip input{display:none}
+.vat-chip .ck{width:14px;height:14px;border-radius:3px;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vat-chip.checked .ck::after{content:'';display:block;width:8px;height:8px;border-radius:1px;background:var(--accent)}
+
+.vat-S.checked{border-color:var(--green);background:rgba(62,207,142,.1);color:var(--green)}
+.vat-S.checked .ck::after{background:var(--green)}
+.vat-Z.checked{border-color:var(--teal);background:rgba(45,212,191,.1);color:var(--teal)}
+.vat-Z.checked .ck::after{background:var(--teal)}
+.vat-E.checked{border-color:var(--amber);background:rgba(245,166,35,.1);color:var(--amber)}
+.vat-E.checked .ck::after{background:var(--amber)}
+.vat-O.checked{border-color:var(--purple);background:rgba(167,139,250,.1);color:var(--purple)}
+.vat-O.checked .ck::after{background:var(--purple)}
+.vat-AE.checked{border-color:var(--red);background:rgba(245,90,90,.1);color:var(--red)}
+.vat-AE.checked .ck::after{background:var(--red)}
+.vat-N.checked{border-color:var(--text2);background:rgba(136,146,168,.1);color:var(--text2)}
+.vat-N.checked .ck::after{background:var(--text2)}
+
+.validity-bar{display:flex;align-items:center;gap:8px;padding:.6rem .9rem;border-radius:7px;font-size:12px;font-family:'IBM Plex Mono',monospace}
+.validity-bar.ok{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.25);color:var(--green)}
+.validity-bar.warn{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);color:var(--amber)}
+.validity-bar.err{background:rgba(245,90,90,.07);border:1px solid rgba(245,90,90,.25);color:var(--red)}
+.validity-bar svg{width:14px;height:14px;stroke:currentColor;flex-shrink:0}
+
+.cat-desc{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:.75rem}
+@media(max-width:600px){.cat-desc{grid-template-columns:repeat(2,1fr)}}
+.cat-item{font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--text3);padding:4px 0}
+.cat-item span{font-weight:600;margin-right:4px}
+
+/* Generate button */
+.gen-btn{width:100%;padding:1rem 1.5rem;background:linear-gradient(135deg,var(--purple),var(--accent));border:none;border-radius:8px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-.1px;margin-top:1.25rem}
+.gen-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.gen-btn:active:not(:disabled){transform:translateY(0)}
+.gen-btn:disabled{opacity:.35;cursor:not-allowed}
+.gen-btn svg{width:18px;height:18px;stroke:currentColor;flex-shrink:0}
+.spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.gen-btn.loading .spinner{display:inline-block}
+.gen-btn.loading .btn-ico{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Result section */
+.result{display:none;margin-top:1.25rem}
+.result.show{display:block}
+
+.res-banner{border-radius:10px 10px 0 0;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem}
+.res-banner.valid{background:rgba(62,207,142,.08);border:1px solid rgba(62,207,142,.25);border-bottom:none}
+.res-banner.invalid{background:rgba(245,90,90,.08);border:1px solid rgba(245,90,90,.25);border-bottom:none}
+.res-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.valid .res-icon{background:rgba(62,207,142,.15)}
+.invalid .res-icon{background:rgba(245,90,90,.15)}
+.res-icon svg{width:20px;height:20px;stroke-width:2.5}
+.valid .res-icon svg{stroke:var(--green)}
+.invalid .res-icon svg{stroke:var(--red)}
+.res-label{font-size:18px;font-weight:600;letter-spacing:-.3px}
+.valid .res-label{color:var(--green)}
+.invalid .res-label{color:var(--red)}
+.res-sub{font-size:12px;color:var(--text2);margin-top:3px;font-family:'IBM Plex Mono',monospace}
+
+.res-actions{background:var(--surface);border:1px solid var(--border);border-top:none;border-bottom:none;padding:1rem 1.5rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.dl-btn{display:inline-flex;align-items:center;gap:7px;padding:.65rem 1.1rem;background:linear-gradient(135deg,var(--green),var(--teal));border:none;border-radius:7px;color:#0d0f14;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s,transform .1s;text-decoration:none}
+.dl-btn:hover{opacity:.88;transform:translateY(-1px)}
+.dl-btn svg{width:14px;height:14px;stroke:currentColor}
+.fn-chip{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text3)}
+
+.issues-box{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border2);border-radius:0 0 10px 10px;overflow:hidden}
+.issue-row{padding:.75rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:.75rem;align-items:flex-start}
+.issue-row:last-child{border-bottom:none}
+.ibadge{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:600;padding:2px 6px;border-radius:3px;letter-spacing:.05em;flex-shrink:0;margin-top:1px}
+.ibadge.fatal{background:rgba(245,90,90,.12);color:var(--red);border:1px solid rgba(245,90,90,.25)}
+.ibadge.warning{background:rgba(245,166,35,.12);color:var(--amber);border:1px solid rgba(245,166,35,.25)}
+.irule{font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--text);margin-bottom:3px}
+.imsg{font-size:12px;color:var(--text2);line-height:1.5}
+.no-issues{padding:1.5rem;text-align:center;color:var(--green);font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
+.no-issues svg{width:15px;height:15px;stroke:var(--green)}
+
+.error-box{padding:.9rem 1.1rem;background:rgba(245,90,90,.07);border:1px solid rgba(245,90,90,.25);border-radius:8px;color:var(--red);font-size:13px;display:none;align-items:center;gap:9px;margin-top:.75rem}
+.error-box.show{display:flex}
+.error-box svg{width:15px;height:15px;stroke:currentColor;flex-shrink:0}
+
+/* section divider */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+
+.footer{padding:1.5rem 0;text-align:center;font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;border-top:1px solid var(--border);margin-top:auto}
+.footer a{color:var(--text3);text-decoration:none}
+.footer a:hover{color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="header">
+  <a href="index.html" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </a>
+  <div class="hd"></div>
+  <span class="ht">XML / JSON Generator</span>
+</div>
+
+<div class="hero">
+  <div class="eyebrow"><span class="dot"></span>UBL 2.1 · PINT AE · Schematron-validated</div>
+  <h1>Generate <span>Test XML / JSON</span></h1>
+  <p>Choose document type, transaction type, VAT category combination, and endpoint identifiers. Generate a compliant PINT AE document in <strong>UBL XML</strong> or <strong>JSON</strong> format — both validated against the schematron rules.</p>
+</div>
+
+<!-- ── Section 1: Document config ── -->
+<div class="card">
+  <div class="card-head" style="color:var(--accent)">
+    <div class="icon" style="background:rgba(78,156,245,.1);border:1px solid rgba(78,156,245,.25)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+    </div>
+    <span class="lbl">Document Configuration</span>
+  </div>
+  <div class="card-body">
+    <div class="row row-4">
+      <div class="field-group">
+        <label class="field-label">Doc Type</label>
+        <select id="docType">
+          <option value="380">380 — Tax Invoice</option>
+          <option value="381">381 — Tax Credit Note</option>
+          <option value="480">480 — Commercial Invoice</option>
+          <option value="81">81 — Commercial Credit Note</option>
+          <option value="389">389 — Self-Billing Invoice</option>
+          <option value="261">261 — Self-Billing Credit Note</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Transaction Type</label>
+        <select id="txType">
+          <option value="Standard">Standard</option>
+          <option value="FTZ">Free Trade Zone</option>
+          <option value="Deemed">Deemed Supply</option>
+          <option value="Margin">Margin Scheme</option>
+          <option value="Summary">Summary Invoice</option>
+          <option value="Continuous">Continuous Supply</option>
+          <option value="Agent">Disclosed Agent</option>
+          <option value="eCommerce">e-Commerce</option>
+          <option value="Exports">Exports</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Currency</label>
+        <select id="currency">
+          <option value="AED">AED — UAE Dirham</option>
+          <option value="USD">USD — US Dollar</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="GBP">GBP — British Pound</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Output Format</label>
+        <select id="outputFormat">
+          <option value="xml">XML — UBL 2.1</option>
+          <option value="json">JSON — PINT AE</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 2: VAT Categories ── -->
+<div class="card">
+  <div class="card-head" style="color:var(--green)">
+    <div class="icon" style="background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.25)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+    <span class="lbl">VAT Categories</span>
+  </div>
+  <div class="card-body">
+    <div class="vat-grid" id="vatGrid">
+      <label class="vat-chip vat-S" data-cat="S"><input type="checkbox" value="S"><div class="ck"></div>S · Standard (5%)</label>
+      <label class="vat-chip vat-Z" data-cat="Z"><input type="checkbox" value="Z"><div class="ck"></div>Z · Zero-rated (0%)</label>
+      <label class="vat-chip vat-E" data-cat="E"><input type="checkbox" value="E"><div class="ck"></div>E · Exempt</label>
+      <label class="vat-chip vat-O" data-cat="O"><input type="checkbox" value="O"><div class="ck"></div>O · Outside Scope</label>
+      <label class="vat-chip vat-AE" data-cat="AE"><input type="checkbox" value="AE"><div class="ck"></div>AE · Reverse Charge</label>
+      <label class="vat-chip vat-N" data-cat="N"><input type="checkbox" value="N"><div class="ck"></div>N · Margin Scheme</label>
+    </div>
+
+    <div class="validity-bar err" id="validityBar">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="validityMsg">Select at least one VAT category</span>
+    </div>
+
+    <div class="cat-desc">
+      <div class="cat-item"><span style="color:var(--green)">S</span> Standard-rated 5% VAT</div>
+      <div class="cat-item"><span style="color:var(--teal)">Z</span> Zero-rated (exports, etc.)</div>
+      <div class="cat-item"><span style="color:var(--amber)">E</span> Exempt (financial, medical)</div>
+      <div class="cat-item"><span style="color:var(--purple)">O</span> Outside scope of VAT</div>
+      <div class="cat-item"><span style="color:var(--red)">AE</span> Reverse charge mechanism</div>
+      <div class="cat-item"><span style="color:var(--text2)">N</span> Margin scheme (380/389 only)</div>
+    </div>
+
+    <div id="itemTypeRow" style="display:none;margin-top:.9rem">
+      <div style="height:1px;background:var(--border);margin-bottom:.9rem"></div>
+      <div class="row row-2">
+        <div class="field-group">
+          <label class="field-label">Item Type <span style="color:var(--red)">*</span> (required for AE)</label>
+          <select id="itemType">
+            <option value="S">S — Services</option>
+            <option value="G">G — Goods</option>
+            <option value="B">B — Both (Goods + Services)</option>
+          </select>
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;padding-top:1.4rem;line-height:1.5">
+          ibr-166-ae: Reverse charge items must declare<br>whether supply is Goods, Services or Both.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Section 3: Endpoints ── -->
+<div class="card">
+  <div class="card-head" style="color:var(--teal)">
+    <div class="icon" style="background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+    </div>
+    <span class="lbl">Party Identifiers</span>
+  </div>
+  <div class="card-body">
+    <div class="two-col">
+      <!-- Supplier -->
+      <div>
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--teal);margin-bottom:.75rem;letter-spacing:.05em;font-weight:600">SUPPLIER</div>
+        <div class="row row-2" style="margin-bottom:.75rem">
+          <div class="field-group">
+            <label class="field-label">Endpoint Scheme</label>
+            <select id="supScheme">
+              <option value="0235">0235 — TRN</option>
+              <option value="0230">0230 — TIN</option>
+              <option value="0088">0088 — GLN</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Endpoint ID</label>
+            <input type="text" id="supEndpoint" placeholder="e.g. 1987654321" maxlength="20">
+          </div>
+        </div>
+        <div class="row row-2">
+          <div class="field-group">
+            <label class="field-label">Trade Name</label>
+            <input type="text" id="supName" placeholder="Supplier Trade Name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">VAT Number <span style="color:var(--text3);font-size:9px">15 digits · starts 1 · ends 03</span></label>
+            <input type="text" id="supVat" placeholder="e.g. 1987654321 0 2003" maxlength="15">
+          </div>
+        </div>
+      </div>
+      <!-- Buyer -->
+      <div>
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--accent);margin-bottom:.75rem;letter-spacing:.05em;font-weight:600">BUYER</div>
+        <div class="row row-2" style="margin-bottom:.75rem">
+          <div class="field-group">
+            <label class="field-label">Endpoint Scheme</label>
+            <select id="buyScheme">
+              <option value="0235">0235 — TRN</option>
+              <option value="0230">0230 — TIN</option>
+              <option value="0088">0088 — GLN</option>
+              <option value="0151">0151 — ABN</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Endpoint ID</label>
+            <input type="text" id="buyEndpoint" placeholder="e.g. 1345678901" maxlength="20">
+          </div>
+        </div>
+        <div class="row row-2">
+          <div class="field-group">
+            <label class="field-label">Trade Name</label>
+            <input type="text" id="buyName" placeholder="Buyer Trade Name">
+          </div>
+          <div class="field-group">
+            <label class="field-label">VAT Number <span style="color:var(--text3);font-size:9px">15 digits · starts 1 · ends 03</span></label>
+            <input type="text" id="buyVat" placeholder="e.g. 1345678901 2 303" maxlength="15">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Conditional fields (FTZ / Agent) ── -->
+<div class="card" id="extraCard" style="display:none">
+  <div class="card-head" style="color:var(--amber)">
+    <div class="icon" style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25)">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <span class="lbl" id="extraCardLabel">Additional Required Fields</span>
+  </div>
+  <div class="card-body">
+    <!-- FTZ Beneficiary ID -->
+    <div id="ftzField" style="display:none">
+      <div class="row row-2">
+        <div class="field-group">
+          <label class="field-label">FTZ Beneficiary ID (BTAE-01) <span style="color:var(--red)">*</span></label>
+          <input type="text" id="ftzBeneficiary" placeholder="e.g. 189098765401003" maxlength="20">
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;padding-top:1.4rem;line-height:1.5">
+          ibr-007-ae: Buyer entity registered within the<br>Free Trade Zone — use their TRN/identifier.
+        </div>
+      </div>
+    </div>
+    <!-- Agent Principal VAT ID -->
+    <div id="agentField" style="display:none">
+      <div class="row row-2">
+        <div class="field-group">
+          <label class="field-label">Principal VAT ID (BTAE-14) <span style="color:var(--red)">*</span></label>
+          <input type="text" id="agentPrincipal" placeholder="15-digit TRN (≠ Supplier VAT)" maxlength="15">
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;padding-top:1.4rem;line-height:1.5">
+          ibr-137-ae: Principal's VAT number (the entity<br>on whose behalf the agent is billing).<br>ibr-176-ae: Must differ from Supplier VAT.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="error-box" id="errorBox">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+  <span id="errorMsg"></span>
+</div>
+
+<button class="gen-btn" id="genBtn" disabled>
+  <svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+  <div class="spinner"></div>
+  <span id="genLabel">Generate XML</span>
+</button>
+
+<!-- ── Result ── -->
+<div class="result" id="result">
+  <div class="res-banner" id="resBanner">
+    <div class="res-icon" id="resIcon"></div>
+    <div>
+      <div class="res-label" id="resLabel"></div>
+      <div class="res-sub"  id="resSub"></div>
+    </div>
+  </div>
+  <div class="res-actions" id="resActions">
+    <button class="dl-btn" id="dlBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download XML
+    </button>
+    <span class="fn-chip" id="fnChip"></span>
+  </div>
+  <div class="issues-box" id="issuesBox"></div>
+</div>
+
+<div class="footer">
+  PINT AE Billing &amp; Self-Billing · urn:peppol:pint:billing-1@ae-1 &nbsp;·&nbsp;
+  <a href="https://docs.peppol.eu/poac/ae/billing/" target="_blank">docs.peppol.eu ↗</a>
+</div>
+</div>
+
+<script>
+// ── Valid VAT rules per doc type ─────────────────────────────────────────────
+// 480/81 = Commercial Invoice/CN: only O/E/Z/AE (no S, no N per schematron ibr-122-ae)
+const DOC_VAT = {
+  "380": { allowed: ["S","E","Z","O","AE","N"], validate: c => c.includes("N") ? c.length===1 : c.includes("S"), hint: "Must include S, or use N alone (Margin scheme)" },
+  "381": { allowed: ["S","E","Z","O","AE"],     validate: c => c.includes("S"),    hint: "Must include S (Tax Credit Note)" },
+  "480": { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "Commercial Invoice: O, E or Z only (no S, AE or N)" },
+  "81":  { allowed: ["O","E","Z"],              validate: c => c.length > 0,       hint: "Commercial Credit Note: O, E or Z only" },
+  "389": { allowed: ["S","E","Z","AE","N"],     validate: c => c.includes("N") ? c.length===1 : c.includes("S"), hint: "Must include S, or use N alone (Margin scheme)" },
+  "261": { allowed: ["S","E","Z","AE"],         validate: c => c.includes("S"),    hint: "Must include S (Self-Billing Credit Note)" },
+};
+
+// ── Transaction type constraints ─────────────────────────────────────────────
+const TRN_DOC = {
+  "Margin":   ["380","389"],
+  "Summary":  ["380","389"],
+};
+const TRN_CAT = {
+  "Margin": { required: "N", exclusive: true, hint: "Margin scheme requires N only" },
+};
+const TRN_CURR = {
+  "Exports": ["AED","USD","EUR","GBP"],
+};
+
+let lastXml = "", lastFilename = "";
+
+// ── DOM refs ─────────────────────────────────────────────────────────────────
+const docTypeEl  = document.getElementById("docType");
+const txTypeEl   = document.getElementById("txType");
+const currEl     = document.getElementById("currency");
+const vatChips   = document.querySelectorAll(".vat-chip");
+const validBar   = document.getElementById("validityBar");
+const validMsg   = document.getElementById("validityMsg");
+const genBtn     = document.getElementById("genBtn");
+const genLabel   = document.getElementById("genLabel");
+const errorBox   = document.getElementById("errorBox");
+const errorMsg   = document.getElementById("errorMsg");
+
+function selectedCats() {
+  return [...vatChips].filter(c => c.querySelector("input").checked && !c.classList.contains("disabled"))
+                      .map(c => c.dataset.cat);
+}
+
+function updateExtraFields() {
+  const tx = txTypeEl.value;
+  const isFTZ   = tx === "FTZ";
+  const isAgent = tx === "Agent";
+  const showExtra = isFTZ || isAgent;
+  document.getElementById("extraCard").style.display = showExtra ? "" : "none";
+  document.getElementById("ftzField").style.display   = isFTZ   ? "" : "none";
+  document.getElementById("agentField").style.display = isAgent  ? "" : "none";
+  if (isFTZ)   document.getElementById("extraCardLabel").textContent = "FTZ — Required Field";
+  if (isAgent) document.getElementById("extraCardLabel").textContent = "Disclosed Agent — Required Field";
+}
+
+function updateItemTypeRow() {
+  const cats = selectedCats();
+  const show = cats.includes("AE");
+  document.getElementById("itemTypeRow").style.display = show ? "" : "none";
+}
+
+function updateVatChips() {
+  const doc  = docTypeEl.value;
+  const tx   = txTypeEl.value;
+  const rule = DOC_VAT[doc];
+  const txc  = TRN_CAT[tx];
+
+  vatChips.forEach(chip => {
+    const cat = chip.dataset.cat;
+    const inp = chip.querySelector("input");
+
+    const allowedByDoc = rule.allowed.includes(cat);
+    // For Margin, only N is allowed
+    const allowedByTx = !txc || (txc.required === cat);
+
+    if (!allowedByDoc || !allowedByTx) {
+      chip.classList.add("disabled");
+      inp.checked = false;
+      chip.classList.remove("checked");
+    } else {
+      chip.classList.remove("disabled");
+    }
+
+    // Auto-check required category for transaction type
+    if (txc && txc.required === cat && allowedByDoc) {
+      inp.checked = true;
+      chip.classList.add("checked");
+    }
+
+    chip.classList.toggle("checked", inp.checked);
+  });
+
+  updateValidity();
+  updateItemTypeRow();
+}
+
+function updateValidity() {
+  const doc  = docTypeEl.value;
+  const tx   = txTypeEl.value;
+  const cats = selectedCats();
+  const rule = DOC_VAT[doc];
+  const txc  = TRN_CAT[tx];
+
+  let ok = false, msg = "";
+
+  if (cats.length === 0) {
+    msg = "Select at least one VAT category";
+  } else if (txc && txc.exclusive && !cats.every(c => c === txc.required)) {
+    msg = txc.hint;
+  } else if (!rule.validate(cats)) {
+    msg = rule.hint;
+  } else {
+    ok = true;
+    const combo = cats.join(" + ");
+    const docLabels = {"380":"Tax Invoice","381":"Tax Credit Note","480":"Commercial Invoice","81":"Commercial Credit Note","389":"Self-Billing Invoice","261":"Self-Billing Credit Note"};
+    msg = `Valid: ${docLabels[doc]} · ${tx} · ${combo}`;
+  }
+
+  validBar.className = "validity-bar " + (ok ? "ok" : "err");
+  validBar.querySelector("svg").innerHTML = ok
+    ? '<polyline points="20 6 9 17 4 12"/>'
+    : '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>';
+  validMsg.textContent = msg;
+  genBtn.disabled = !ok;
+}
+
+// Toggle chip on click
+vatChips.forEach(chip => {
+  chip.addEventListener("click", e => {
+    if (chip.classList.contains("disabled")) return;
+    const inp = chip.querySelector("input");
+    inp.checked = !inp.checked;
+    chip.classList.toggle("checked", inp.checked);
+    updateValidity();
+    updateItemTypeRow();
+  });
+});
+
+docTypeEl.addEventListener("change", updateVatChips);
+txTypeEl.addEventListener("change", () => {
+  updateVatChips();
+  updateExtraFields();
+});
+currEl.addEventListener("change", updateValidity);
+
+// ── Generate ─────────────────────────────────────────────────────────────────
+genBtn.addEventListener("click", async () => {
+  const cats = selectedCats();
+  if (!cats.length) return;
+
+  errorBox.classList.remove("show");
+  document.getElementById("result").classList.remove("show");
+  genBtn.classList.add("loading");
+  genBtn.disabled = true;
+  genLabel.textContent = "Generating…";
+
+  const fmt = document.getElementById("outputFormat").value;
+
+  const body = {
+    doc_type:               docTypeEl.value,
+    vat_categories:         cats,
+    transaction_type:       txTypeEl.value,
+    currency:               currEl.value,
+    supplier_endpoint_scheme: document.getElementById("supScheme").value,
+    supplier_endpoint_id:   document.getElementById("supEndpoint").value.trim(),
+    buyer_endpoint_scheme:  document.getElementById("buyScheme").value,
+    buyer_endpoint_id:      document.getElementById("buyEndpoint").value.trim(),
+    supplier_name:          document.getElementById("supName").value.trim(),
+    buyer_name:             document.getElementById("buyName").value.trim(),
+    supplier_vat:           document.getElementById("supVat").value.trim(),
+    buyer_vat:              document.getElementById("buyVat").value.trim(),
+    item_type:              document.getElementById("itemType").value,
+    ftz_beneficiary_id:     document.getElementById("ftzBeneficiary").value.trim(),
+    agent_principal_id:     document.getElementById("agentPrincipal").value.trim(),
+  };
+
+  const endpoint = fmt === "json" ? "/api/generate-json" : "/api/generate";
+
+  try {
+    const resp = await fetch(endpoint, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      showError(data.error || "Server error");
+      return;
+    }
+
+    if (fmt === "json") {
+      lastXml      = data.json;
+      lastFilename = data.filename;
+    } else {
+      lastXml      = data.xml;
+      lastFilename = data.filename;
+    }
+    renderResult(data, fmt);
+
+  } catch(e) {
+    showError("Could not reach the server. Ensure app.py is running on port 5000.");
+  } finally {
+    genBtn.classList.remove("loading");
+    genBtn.disabled = false;
+    genLabel.textContent = fmt === "json" ? "Generate JSON" : "Generate XML";
+  }
+});
+
+function showError(msg) {
+  errorMsg.textContent = msg;
+  errorBox.classList.add("show");
+}
+
+function renderResult(data, fmt = "xml") {
+  const v   = data.validation || {};
+  const ok  = v.is_valid === true;
+
+  const banner = document.getElementById("resBanner");
+  banner.className = "res-banner " + (ok ? "valid" : "invalid");
+
+  document.getElementById("resIcon").innerHTML = ok
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+  document.getElementById("resLabel").textContent = ok ? "VALID" : "INVALID";
+  document.getElementById("resSub").textContent = ok
+    ? `${v.doc_type || ""} passes all PINT AE schematron rules${v.warning_count ? ` · ${v.warning_count} warning(s)` : ""}`
+    : `${v.fatal_count || 0} fatal error(s) · ${v.warning_count || 0} warning(s)`;
+
+  document.getElementById("fnChip").textContent  = data.filename || "";
+
+  const dlBtn = document.getElementById("dlBtn");
+  const dlLabel = fmt === "json" ? "Download JSON" : "Download XML";
+  dlBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>${dlLabel}`;
+  const mime = fmt === "json" ? "application/json" : "application/xml";
+  dlBtn.onclick = () => downloadContent(lastXml, lastFilename, mime);
+
+  const issBox = document.getElementById("issuesBox");
+  if (!v.issues || v.issues.length === 0) {
+    issBox.innerHTML = `<div class="no-issues"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>All rules passed — no issues found.</div>`;
+  } else {
+    issBox.innerHTML = v.issues.map(i => `
+      <div class="issue-row">
+        <span class="ibadge ${i.flag}">${i.flag.toUpperCase()}</span>
+        <div><div class="irule">${esc(i.rule_id)}</div><div class="imsg">${esc(i.message)}</div></div>
+      </div>`).join("");
+  }
+
+  document.getElementById("result").classList.add("show");
+  document.getElementById("result").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function downloadContent(content, filename, mime = "application/xml") {
+  const blob = new Blob([content], {type: mime});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+document.getElementById("outputFormat").addEventListener("change", function() {
+  genLabel.textContent = this.value === "json" ? "Generate JSON" : "Generate XML";
+});
+
+// Init
+updateVatChips();
+document.querySelector('.vat-chip[data-cat="S"] input').checked = true;
+document.querySelector('.vat-chip[data-cat="S"]').classList.add("checked");
+updateValidity();
+updateItemTypeRow();
+updateExtraFields();
+</script>
+</body>
+</html>

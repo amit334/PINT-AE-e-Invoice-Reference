@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — XML Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #161920;
+  --surface2: #1e2230;
+  --border: #2a2f3d;
+  --border2: #363c50;
+  --text: #e8ecf4;
+  --text2: #8892a8;
+  --text3: #545e74;
+  --accent: #4e9cf5;
+  --green: #3ecf8e;
+  --amber: #f5a623;
+  --red: #f55a5a;
+  --purple: #a78bfa;
+  --teal: #2dd4bf;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(78,156,245,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(78,156,245,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+.page { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; max-width: 860px; margin: 0 auto; width: 100%; padding: 0 1.5rem; }
+
+/* Header */
+.header {
+  padding: 2rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.back-link:hover { color: var(--text2); }
+.header-divider { width: 1px; height: 16px; background: var(--border2); }
+.header-title {
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+}
+
+/* Hero */
+.hero {
+  padding: 2.5rem 0 2rem;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--amber);
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.25);
+  border-radius: 20px;
+  padding: 4px 14px;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.05em;
+}
+.hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); animation: pulse 2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero h1 {
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(135deg, #e8ecf4 30%, #8892a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero h1 span {
+  background: linear-gradient(135deg, var(--amber), #f5724a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p { font-size: 13px; color: var(--text2); line-height: 1.65; max-width: 520px; }
+
+/* Upload zone */
+.upload-section { margin-bottom: 1.5rem; }
+
+.drop-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  position: relative;
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: var(--amber);
+  background: rgba(245,166,35,0.04);
+}
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.drop-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+.drop-icon svg { width: 24px; height: 24px; stroke: var(--amber); }
+.drop-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+.drop-sub { font-size: 12px; color: var(--text3); }
+.drop-sub span { color: var(--amber); }
+
+/* File selected state */
+.file-info {
+  display: none;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 0.75rem;
+}
+.file-info.show { display: flex; }
+.file-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(245,166,35,0.1);
+  border: 1px solid rgba(245,166,35,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.file-icon svg { width: 18px; height: 18px; stroke: var(--amber); }
+.file-meta { flex: 1; min-width: 0; }
+.file-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-size { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); margin-top: 2px; }
+.file-remove {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.file-remove:hover { color: var(--red); }
+.file-remove svg { width: 16px; height: 16px; stroke: currentColor; }
+
+/* Validate button */
+.validate-btn {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: linear-gradient(135deg, var(--amber), #f5724a);
+  border: none;
+  border-radius: 8px;
+  color: #0d0f14;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1rem;
+  letter-spacing: -0.1px;
+}
+.validate-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.validate-btn:active:not(:disabled) { transform: translateY(0); }
+.validate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.validate-btn svg { width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0; }
+
+/* Spinner */
+.spinner {
+  display: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(13,15,20,0.3);
+  border-top-color: #0d0f14;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.validate-btn.loading .spinner { display: inline-block; }
+.validate-btn.loading .btn-icon { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Results */
+.results { display: none; margin-top: 0.5rem; margin-bottom: 2rem; }
+.results.show { display: block; }
+
+.result-banner {
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+.result-banner.valid { background: rgba(62,207,142,0.08); border: 1px solid rgba(62,207,142,0.25); border-bottom: none; }
+.result-banner.invalid { background: rgba(245,90,90,0.08); border: 1px solid rgba(245,90,90,0.25); border-bottom: none; }
+
+.result-status-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.valid .result-status-icon { background: rgba(62,207,142,0.15); }
+.invalid .result-status-icon { background: rgba(245,90,90,0.15); }
+.result-status-icon svg { width: 22px; height: 22px; stroke-width: 2.5; }
+.valid .result-status-icon svg { stroke: var(--green); }
+.invalid .result-status-icon svg { stroke: var(--red); }
+
+.result-status-text .label {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.valid .result-status-text .label { color: var(--green); }
+.invalid .result-status-text .label { color: var(--red); }
+.result-status-text .sub {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.result-meta {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-bottom: none;
+  padding: 1rem 1.75rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.result-meta-item { }
+.result-meta-item .key { font-size: 10px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 3px; }
+.result-meta-item .val { font-size: 13px; font-weight: 500; color: var(--text); }
+.val.fatal { color: var(--red); }
+.val.warn { color: var(--amber); }
+.val.ok { color: var(--green); }
+
+/* Issues */
+.issues-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border2);
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+.no-issues {
+  padding: 2rem 1.75rem;
+  text-align: center;
+  color: var(--green);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.no-issues svg { width: 16px; height: 16px; stroke: var(--green); }
+
+.phase-group { border-top: 1px solid var(--border); }
+.phase-group:first-child { border-top: none; }
+
+.phase-header {
+  padding: 0.85rem 1.75rem;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.phase-header:hover { background: #22273a; }
+.phase-name {
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.phase-badges { display: flex; align-items: center; gap: 6px; }
+.phase-badge {
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.phase-badge.fatal { background: rgba(245,90,90,0.12); color: var(--red); border: 1px solid rgba(245,90,90,0.25); }
+.phase-badge.warning { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.25); }
+.phase-chevron { color: var(--text3); transition: transform 0.2s; }
+.phase-header.open .phase-chevron { transform: rotate(180deg); }
+.phase-chevron svg { width: 14px; height: 14px; stroke: currentColor; display: block; }
+
+.issue-list { display: none; }
+.issue-list.open { display: block; }
+
+.issue-item {
+  padding: 0.9rem 1.75rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 1rem;
+}
+.issue-flag-badge {
+  font-size: 9px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+.issue-flag-badge.fatal { background: rgba(245,90,90,0.12); color: var(--red); border: 1px solid rgba(245,90,90,0.25); }
+.issue-flag-badge.warning { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.25); }
+
+.issue-body { flex: 1; min-width: 0; }
+.issue-rule {
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.issue-msg { font-size: 13px; color: var(--text2); line-height: 1.55; }
+.issue-location {
+  display: none;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  margin-top: 5px;
+  word-break: break-all;
+}
+.show-locations .issue-location { display: block; }
+
+/* Field info cards */
+.field-cards {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field-card {
+  background: rgba(78,156,245,0.05);
+  border: 1px solid rgba(78,156,245,0.18);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.field-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+  flex-wrap: wrap;
+}
+.field-id-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(78,156,245,0.15);
+  color: var(--accent);
+  border: 1px solid rgba(78,156,245,0.3);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.field-name {
+  font-weight: 500;
+  color: var(--text);
+  font-size: 12px;
+}
+.field-mapping {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--teal);
+  margin-top: 2px;
+}
+.field-desc {
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+
+/* Location toggle */
+.result-options {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.75rem 1.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-bottom: none;
+}
+.toggle-locations {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+.toggle-locations:hover { color: var(--text2); }
+.toggle-switch {
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--border2);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--text3);
+  transition: transform 0.2s, background 0.2s;
+}
+.toggle-locations.active .toggle-switch { background: rgba(78,156,245,0.3); }
+.toggle-locations.active .toggle-switch::after { transform: translateX(12px); background: var(--accent); }
+
+/* Error banner */
+.error-banner {
+  display: none;
+  padding: 1rem 1.25rem;
+  background: rgba(245,90,90,0.08);
+  border: 1px solid rgba(245,90,90,0.25);
+  border-radius: 8px;
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 0.75rem;
+  align-items: center;
+  gap: 10px;
+}
+.error-banner.show { display: flex; }
+.error-banner svg { width: 16px; height: 16px; stroke: currentColor; flex-shrink: 0; }
+
+/* Footer */
+.footer {
+  padding: 1.5rem 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'IBM Plex Mono', monospace;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.footer a { color: var(--text3); text-decoration: none; }
+.footer a:hover { color: var(--text2); }
+
+@media (max-width: 600px) {
+  .result-meta { gap: 1rem; }
+  .result-banner { padding: 1.25rem; }
+  .issue-item { padding: 0.9rem 1.25rem; }
+  .phase-header { padding: 0.85rem 1.25rem; }
+  .result-options { padding: 0.75rem 1.25rem; }
+  .no-issues { padding: 1.5rem 1.25rem; }
+}
+</style>
+<script src="field_lookup.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <a href="index.html" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back
+    </a>
+    <div class="header-divider"></div>
+    <span class="header-title">XML Validator</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Schematron · XSLT 2.0 · PINT AE
+    </div>
+    <h1>Validate Your<br><span>e-Invoice XML</span></h1>
+    <p>Upload a UBL Invoice or CreditNote XML and validate it against the PINT AE Billing 1.0 schematron rules — covering both core PINT rules and UAE jurisdiction-aligned rules.</p>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload-section">
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".xml,text/xml,application/xml">
+      <div class="drop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <div class="drop-title">Drop your XML file here</div>
+      <div class="drop-sub">or <span>click to browse</span> — .xml files only</div>
+    </div>
+
+    <div class="file-info" id="fileInfo">
+      <div class="file-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="9" y1="13" x2="15" y2="13"/>
+        </svg>
+      </div>
+      <div class="file-meta">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-size" id="fileSize"></div>
+      </div>
+      <button class="file-remove" id="fileRemove" title="Remove file">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="error-banner" id="errorBanner">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="errorText"></span>
+    </div>
+
+    <button class="validate-btn" id="validateBtn" disabled>
+      <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <div class="spinner"></div>
+      <span id="btnLabel">Validate XML</span>
+    </button>
+  </div>
+
+  <!-- Results -->
+  <div class="results" id="results">
+
+    <div class="result-banner" id="resultBanner">
+      <div class="result-status-icon" id="resultIcon">
+        <!-- injected by JS -->
+      </div>
+      <div class="result-status-text">
+        <div class="label" id="resultLabel"></div>
+        <div class="sub" id="resultSub"></div>
+      </div>
+    </div>
+
+    <div class="result-meta" id="resultMeta">
+      <div class="result-meta-item">
+        <div class="key">File</div>
+        <div class="val" id="metaFile"></div>
+      </div>
+      <div class="result-meta-item">
+        <div class="key">Document type</div>
+        <div class="val" id="metaDocType"></div>
+      </div>
+      <div class="result-meta-item">
+        <div class="key">Fatal errors</div>
+        <div class="val" id="metaFatal"></div>
+      </div>
+      <div class="result-meta-item">
+        <div class="key">Warnings</div>
+        <div class="val" id="metaWarnings"></div>
+      </div>
+    </div>
+
+    <div class="result-options" id="resultOptions" style="display:none">
+      <div class="toggle-locations" id="locationToggle">
+        <div class="toggle-switch"></div>
+        Show XPath locations
+      </div>
+    </div>
+
+    <div class="issues-container" id="issuesContainer"></div>
+
+  </div>
+
+  <div class="footer">
+    PINT AE Billing &amp; Self-Billing · urn:peppol:pint:billing-1@ae-1 &nbsp;·&nbsp;
+    <a href="https://docs.peppol.eu/poac/ae/billing/" target="_blank">docs.peppol.eu ↗</a>
+  </div>
+
+</div>
+
+<script>
+const dropZone     = document.getElementById('dropZone');
+const fileInput    = document.getElementById('fileInput');
+const fileInfo     = document.getElementById('fileInfo');
+const fileName     = document.getElementById('fileName');
+const fileSize     = document.getElementById('fileSize');
+const fileRemove   = document.getElementById('fileRemove');
+const validateBtn  = document.getElementById('validateBtn');
+const btnLabel     = document.getElementById('btnLabel');
+const errorBanner  = document.getElementById('errorBanner');
+const errorText    = document.getElementById('errorText');
+const results      = document.getElementById('results');
+const resultBanner = document.getElementById('resultBanner');
+const resultIcon   = document.getElementById('resultIcon');
+const resultLabel  = document.getElementById('resultLabel');
+const resultSub    = document.getElementById('resultSub');
+const metaFile     = document.getElementById('metaFile');
+const metaDocType  = document.getElementById('metaDocType');
+const metaFatal    = document.getElementById('metaFatal');
+const metaWarnings = document.getElementById('metaWarnings');
+const resultOptions= document.getElementById('resultOptions');
+const locationToggle = document.getElementById('locationToggle');
+const issuesContainer = document.getElementById('issuesContainer');
+
+let selectedFile = null;
+let showLocations = false;
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function setFile(file) {
+  if (!file || !file.name.toLowerCase().endsWith('.xml')) {
+    showError('Only XML files are supported.');
+    return;
+  }
+  hideError();
+  selectedFile = file;
+  fileName.textContent = file.name;
+  fileSize.textContent = formatBytes(file.size);
+  fileInfo.classList.add('show');
+  validateBtn.disabled = false;
+  results.classList.remove('show');
+}
+
+function clearFile() {
+  selectedFile = null;
+  fileInput.value = '';
+  fileInfo.classList.remove('show');
+  validateBtn.disabled = true;
+  results.classList.remove('show');
+  hideError();
+}
+
+function showError(msg) {
+  errorText.textContent = msg;
+  errorBanner.classList.add('show');
+}
+
+function hideError() {
+  errorBanner.classList.remove('show');
+}
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files[0]) setFile(fileInput.files[0]);
+});
+
+fileRemove.addEventListener('click', clearFile);
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const file = e.dataTransfer?.files[0];
+  if (file) setFile(file);
+});
+
+validateBtn.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  hideError();
+  validateBtn.classList.add('loading');
+  validateBtn.disabled = true;
+  btnLabel.textContent = 'Validating…';
+  results.classList.remove('show');
+
+  const form = new FormData();
+  form.append('file', selectedFile);
+
+  try {
+    const resp = await fetch('/api/validate', { method: 'POST', body: form });
+    const data = await resp.json();
+
+    if (!resp.ok || data.error) {
+      showError(data.error || 'Server error — check that the backend is running.');
+    } else {
+      renderResults(data);
+    }
+  } catch (e) {
+    showError('Could not reach the validation server. Make sure app.py is running on port 5000.');
+  } finally {
+    validateBtn.classList.remove('loading');
+    validateBtn.disabled = false;
+    btnLabel.textContent = 'Validate XML';
+  }
+});
+
+function fieldCards(message, ruleId) {
+  const combined = (ruleId || '') + ' ' + (message || '');
+  const seen = new Set();
+  const matches = combined.match(/\b(IBT-\d[\d\w-]*|BTAE-\d[\d\w-]*|IBG-\d[\d\w-]*)/g) || [];
+  const cards = [];
+  for (const code of matches) {
+    const key = code.replace(/\.$/, '');
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const info = (typeof FIELD_INFO !== 'undefined') && FIELD_INFO[key];
+    if (!info || !info.name) continue;
+    const desc = info.desc ? `<div class="field-desc">${escHtml(info.desc)}</div>` : '';
+    const mapping = info.field ? `<div class="field-mapping">${escHtml(info.field)}</div>` : '';
+    cards.push(`
+      <div class="field-card">
+        <div class="field-card-header">
+          <span class="field-id-badge">${escHtml(key)}</span>
+          <span class="field-name">${escHtml(info.name)}</span>
+        </div>
+        ${mapping}${desc}
+      </div>`);
+  }
+  return cards.length ? `<div class="field-cards">${cards.join('')}</div>` : '';
+}
+
+function renderResults(data) {
+  const valid = data.is_valid;
+
+  resultBanner.className = 'result-banner ' + (valid ? 'valid' : 'invalid');
+  resultIcon.innerHTML = valid
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+
+  resultLabel.textContent = valid ? 'VALID' : 'INVALID';
+  resultSub.textContent = valid
+    ? (data.warning_count ? `${data.warning_count} warning(s) — document is compliant` : 'Document passes all PINT AE schematron rules')
+    : `${data.fatal_count} fatal error(s) found — document is non-compliant`;
+
+  metaFile.textContent     = data.filename;
+  metaDocType.textContent  = data.doc_type;
+  metaFatal.className      = 'val' + (data.fatal_count > 0 ? ' fatal' : ' ok');
+  metaFatal.textContent    = data.fatal_count;
+  metaWarnings.className   = 'val' + (data.warning_count > 0 ? ' warn' : ' ok');
+  metaWarnings.textContent = data.warning_count;
+
+  issuesContainer.innerHTML = '';
+
+  if (!data.issues || data.issues.length === 0) {
+    resultOptions.style.display = 'none';
+    issuesContainer.innerHTML = `
+      <div class="no-issues">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        No issues found — all rules passed.
+      </div>`;
+  } else {
+    resultOptions.style.display = 'flex';
+
+    const grouped = {};
+    for (const issue of data.issues) {
+      (grouped[issue.phase] = grouped[issue.phase] || []).push(issue);
+    }
+
+    for (const [phase, issues] of Object.entries(grouped)) {
+      const fatals   = issues.filter(i => i.flag === 'fatal').length;
+      const warnings = issues.filter(i => i.flag === 'warning').length;
+
+      const badges = [
+        fatals   ? `<span class="phase-badge fatal">${fatals} fatal</span>`   : '',
+        warnings ? `<span class="phase-badge warning">${warnings} warn</span>` : '',
+      ].join('');
+
+      const group = document.createElement('div');
+      group.className = 'phase-group';
+      group.innerHTML = `
+        <div class="phase-header open" data-phase="${phase}">
+          <span class="phase-name">${phase}</span>
+          <div class="phase-badges">
+            ${badges}
+            <span class="phase-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </div>
+        </div>
+        <div class="issue-list open" id="phase-${phase.replace(/\s+/g,'-')}">
+          ${issues.map(i => `
+            <div class="issue-item">
+              <span class="issue-flag-badge ${i.flag}">${i.flag.toUpperCase()}</span>
+              <div class="issue-body">
+                <div class="issue-rule">${escHtml(i.rule_id)}</div>
+                <div class="issue-msg">${escHtml(i.message)}</div>
+                ${i.location ? `<div class="issue-location">${escHtml(i.location)}</div>` : ''}
+                ${fieldCards(i.message, i.rule_id)}
+              </div>
+            </div>`).join('')}
+        </div>`;
+      issuesContainer.appendChild(group);
+    }
+
+    issuesContainer.querySelectorAll('.phase-header').forEach(hdr => {
+      hdr.addEventListener('click', () => {
+        const listId = 'phase-' + hdr.dataset.phase.replace(/\s+/g, '-');
+        const list = document.getElementById(listId);
+        const open = list.classList.toggle('open');
+        hdr.classList.toggle('open', open);
+      });
+    });
+  }
+
+  results.classList.add('show');
+  results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+locationToggle.addEventListener('click', () => {
+  showLocations = !showLocations;
+  locationToggle.classList.toggle('active', showLocations);
+  issuesContainer.classList.toggle('show-locations', showLocations);
+});
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — Valid Scenarios & Edge Cases</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0f14; --surface:#161920; --surface2:#1e2230; --surface3:#252a3a;
+  --border:#2a2f3d; --border2:#363c50;
+  --text:#e8ecf4; --text2:#8892a8; --text3:#545e74;
+  --accent:#4e9cf5; --green:#3ecf8e; --amber:#f5a623; --red:#f55a5a;
+  --purple:#a78bfa; --teal:#2dd4bf; --pink:#f472b6;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(78,156,245,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(78,156,245,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+
+/* Topbar */
+.topbar{position:relative;z-index:10;padding:.9rem 2rem;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);text-decoration:none;padding:5px 10px;border:1px solid var(--border2);border-radius:5px;font-family:var(--mono);transition:all .15s}
+.back-btn:hover{color:var(--text);border-color:var(--accent)}
+.page-title{font-size:15px;font-weight:600}
+.page-sub{font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px}
+
+/* Tab bar */
+.tabbar{position:relative;z-index:9;background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem;gap:0}
+.tab{padding:.85rem 1.5rem;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;user-select:none;display:flex;align-items:center;gap:8px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.tab-count{font-size:10px;font-family:var(--mono);padding:1px 6px;border-radius:3px;background:var(--surface2);color:var(--text3)}
+.tab.active .tab-count{background:rgba(78,156,245,.15);color:var(--accent)}
+
+/* Tab panels */
+.tab-panel{display:none;flex:1;flex-direction:column;position:relative;z-index:1}
+.tab-panel.active{display:flex}
+
+/* ═══════════════════════════════════════════
+   TAB 1 — VALID SCENARIOS (408 combinations)
+   ═══════════════════════════════════════════ */
+.toolbar{padding:.9rem 2rem;background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.toolbar select{background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-radius:6px;padding:7px 28px 7px 10px;font-size:12px;font-family:var(--sans);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238892a8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.toolbar select:focus{outline:none;border-color:var(--accent)}
+.toolbar select option{background:#1e2230}
+.count-pill{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:20px;background:rgba(78,156,245,.12);color:var(--accent);border:1px solid rgba(78,156,245,.25);margin-left:auto}
+
+.table-wrap{padding:0 2rem 2rem;overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:1rem}
+thead th{font-size:11px;font-weight:500;color:var(--text2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border2);background:var(--surface);position:sticky;top:0;z-index:2;white-space:nowrap}
+th:nth-child(1){width:10%}th:nth-child(2){width:20%}th:nth-child(3){width:20%}th:nth-child(4){width:9%}th:nth-child(5){width:41%}
+tbody tr{border-bottom:.5px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--surface)}
+td{padding:8px 10px;vertical-align:middle;font-size:12px}
+
+.pill{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:4px;font-family:var(--mono);white-space:nowrap}
+.doc-380{background:rgba(78,156,245,.15);color:#4e9cf5;border:1px solid rgba(78,156,245,.3)}
+.doc-381{background:rgba(245,90,90,.15);color:#f55a5a;border:1px solid rgba(245,90,90,.3)}
+.doc-389{background:rgba(62,207,142,.15);color:#3ecf8e;border:1px solid rgba(62,207,142,.3)}
+.doc-261{background:rgba(167,139,250,.15);color:#a78bfa;border:1px solid rgba(167,139,250,.3)}
+.doc-480{background:rgba(136,135,128,.15);color:#888780;border:1px solid rgba(136,135,128,.3)}
+.doc-81{background:rgba(45,212,191,.15);color:#2dd4bf;border:1px solid rgba(45,212,191,.3)}
+.vat-S{background:rgba(78,156,245,.12);color:#4e9cf5;border:1px solid rgba(78,156,245,.25)}
+.vat-AE{background:rgba(245,166,35,.12);color:#f5a623;border:1px solid rgba(245,166,35,.25)}
+.vat-Z{background:rgba(62,207,142,.12);color:#3ecf8e;border:1px solid rgba(62,207,142,.25)}
+.vat-E{background:rgba(244,114,182,.12);color:#f472b6;border:1px solid rgba(244,114,182,.25)}
+.vat-O{background:rgba(136,135,128,.12);color:#888780;border:1px solid rgba(136,135,128,.25)}
+.vat-N{background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.25)}
+.txn-badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--text3);font-family:var(--mono)}
+.txn-name{font-size:11px;color:var(--text2);display:block;margin-top:2px}
+.note-text{font-size:11px;color:var(--text2);line-height:1.5}
+.empty-row{text-align:center;padding:3rem;color:var(--text3);font-size:13px}
+
+/* ═══════════════════════════════════════════
+   TAB 2 — MULTI-VAT & EDGE CASES
+   ═══════════════════════════════════════════ */
+.edge-toolbar{padding:.9rem 2rem;background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font-size:12px;padding:5px 12px;border-radius:5px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.chip:hover{color:var(--text);border-color:var(--border2)}
+.chip.active-all{background:var(--surface3);color:var(--text);border-color:var(--border2)}
+.chip.active-multi{background:rgba(167,139,250,.15);color:#a78bfa;border-color:rgba(167,139,250,.4)}
+.chip.active-currency{background:rgba(245,166,35,.15);color:#f5a623;border-color:rgba(245,166,35,.4)}
+.chip.active-calc{background:rgba(62,207,142,.15);color:#3ecf8e;border-color:rgba(62,207,142,.4)}
+.chip.active-edge{background:rgba(245,166,35,.12);color:#f5a623;border-color:rgba(245,166,35,.3)}
+.chip.active-neg{background:rgba(245,90,90,.15);color:#f55a5a;border-color:rgba(245,90,90,.4)}
+.chip-badge{font-size:10px;opacity:.6;margin-left:4px}
+
+.edge-content{padding:1.5rem 2rem;overflow-y:auto;flex:1}
+.edge-count{font-size:12px;color:var(--text2);margin-bottom:1rem;font-family:var(--mono)}
+.edge-count b{color:var(--text)}
+
+.scenario{border:1px solid var(--border);border-radius:8px;padding:1.25rem;margin-bottom:10px;background:var(--surface);transition:border-color .15s}
+.scenario:hover{border-color:var(--border2)}
+.sc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.sc-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.3}
+.sc-tags{display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0}
+.sc-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:3px;font-family:var(--mono)}
+.t-multi{background:rgba(167,139,250,.15);color:#a78bfa}
+.t-currency{background:rgba(245,166,35,.15);color:#f5a623}
+.t-calc{background:rgba(62,207,142,.15);color:#3ecf8e}
+.t-edge{background:rgba(245,166,35,.1);color:#f5a623}
+.t-neg{background:rgba(245,90,90,.15);color:#f55a5a}
+.t-valid{background:rgba(62,207,142,.1);color:#3ecf8e}
+
+.sc-verdict{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:3px;margin-bottom:8px;font-family:var(--mono)}
+.v-valid{background:rgba(62,207,142,.1);color:#3ecf8e;border:1px solid rgba(62,207,142,.25)}
+.v-invalid{background:rgba(245,90,90,.1);color:#f55a5a;border:1px solid rgba(245,90,90,.25)}
+
+.sc-desc{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+
+.sc-rules{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.rule-badge{font-size:10px;font-family:var(--mono);padding:2px 6px;border-radius:3px;background:var(--surface2);color:var(--text3);border:.5px solid var(--border)}
+
+.sc-divider{height:.5px;background:var(--border);margin-bottom:10px}
+
+.sc-conditions{font-size:11px;color:var(--text2);line-height:1.7}
+.sc-conditions li{padding-left:4px;margin-bottom:1px}
+.sc-conditions li::marker{color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="index.html" class="back-btn">← Back</a>
+  <div>
+    <div class="page-title">Valid Scenarios & Edge Cases</div>
+    <div class="page-sub">PINT AE Billing & Self-Billing — 408 combinations (168 single-VAT + 240 multi-VAT) + edge case rules</div>
+  </div>
+</div>
+
+<!-- Tab bar -->
+<div class="tabbar">
+  <div class="tab active" id="tab1" onclick="switchTab(1)">
+    Valid Scenarios
+    <span class="tab-count">408</span>
+  </div>
+  <div class="tab" id="tab2" onclick="switchTab(2)">
+    Multi-VAT &amp; Edge Cases
+    <span class="tab-count">29</span>
+  </div>
+</div>
+
+<!-- ═══ TAB 1 ═══ -->
+<div class="tab-panel active" id="panel1">
+  <div class="toolbar">
+    <select id="fDoc" onchange="renderT1()">
+      <option value="">All document types</option>
+      <option value="380">380 — Tax Invoice</option>
+      <option value="381">381 — Tax Credit Note</option>
+      <option value="389">389 — Self-Billing Invoice</option>
+      <option value="261">261 — Self-Billing Credit Note</option>
+      <option value="480">480 — Invoice (Out of Scope)</option>
+      <option value="81">81 — Credit Note (Out of Scope)</option>
+    </select>
+    <select id="fTxn" onchange="renderT1()">
+      <option value="">All transaction types</option>
+      <option value="00000000">00000000 — Standard</option>
+      <option value="10000000">10000000 — Free Trade Zone</option>
+      <option value="01000000">01000000 — Deemed Supply</option>
+      <option value="00100000">00100000 — Profit Margin Scheme</option>
+      <option value="00010000">00010000 — Summary Invoice</option>
+      <option value="00001000">00001000 — Continuous Supply</option>
+      <option value="00000100">00000100 — Disclosed Agent Billing</option>
+      <option value="00000010">00000010 — E-commerce</option>
+      <option value="00000001">00000001 — Exports</option>
+    </select>
+    <select id="fVat" onchange="renderT1()">
+      <option value="">All VAT codes</option>
+      <option value="S">S — Standard Rate (5%)</option>
+      <option value="AE">AE — VAT Reverse Charge</option>
+      <option value="Z">Z — Zero Rated</option>
+      <option value="E">E — Exempt from Tax</option>
+      <option value="O">O — Not Subject to VAT</option>
+      <option value="N">N — Standard Rate Additional VAT</option>
+    </select>
+    <span class="count-pill" id="t1count">408 combinations</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Doc type</th>
+          <th>Doc name</th>
+          <th>Transaction type</th>
+          <th>VAT code</th>
+          <th>Notes &amp; conditions</th>
+        </tr>
+      </thead>
+      <tbody id="t1body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ TAB 2 ═══ -->
+<div class="tab-panel" id="panel2">
+  <div class="edge-toolbar" id="edgeFilters"></div>
+  <div class="edge-content">
+    <div class="edge-count" id="edgeCount"></div>
+    <div id="edgeList"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   TAB SWITCHING
+   ═══════════════════════════════════════ */
+function switchTab(n) {
+  document.getElementById('tab1').classList.toggle('active', n===1);
+  document.getElementById('tab2').classList.toggle('active', n===2);
+  document.getElementById('panel1').classList.toggle('active', n===1);
+  document.getElementById('panel2').classList.toggle('active', n===2);
+}
+
+/* ═══════════════════════════════════════
+   TAB 1 DATA — 408 VALID COMBINATIONS
+   (168 single-VAT + 240 multi-VAT)
+   ═══════════════════════════════════════ */
+const T1DATA = [
+  ["380","Tax Invoice","00000000","Standard","S","Standard invoice. Supplier charges 5% VAT. BTAE-08 & BTAE-10 mandatory per line."],
+  ["380","Tax Invoice","00000000","Standard","AE","Reverse charge invoice. Buyer VAT TRN (IBT-048) mandatory. Tax amount = 0."],
+  ["380","Tax Invoice","00000000","Standard","Z","Zero-rated invoice e.g. international services. Rate must be explicitly 0."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","S","Goods in/through UAE FTZ at 5% VAT. Beneficiary ID (BTAE-01) mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","AE","FTZ supply under reverse charge. Beneficiary ID mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","Z","FTZ zero-rated supply. Beneficiary ID mandatory."],
+  ["380","Tax Invoice","01000000","Deemed Supply","S","Deemed supply at 5%. No due date required. Payment means required."],
+  ["380","Tax Invoice","01000000","Deemed Supply","AE","Deemed supply under reverse charge."],
+  ["380","Tax Invoice","01000000","Deemed Supply","Z","Deemed supply at zero rate."],
+  ["380","Tax Invoice","00100000","Profit Margin Scheme","N","Margin scheme (second-hand goods). ONLY N allowed. Tax amount = 0; rate > 0."],
+  ["380","Tax Invoice","00010000","Summary Invoice","S","Periodic summary invoice. Invoice period (IBG-14) mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","AE","Summary invoice with reverse charge. Invoice period mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","Z","Summary invoice for zero-rated supplies. Invoice period mandatory."],
+  ["380","Tax Invoice","00001000","Continuous Supply","S","Utilities, telecoms, subscriptions at 5%."],
+  ["380","Tax Invoice","00001000","Continuous Supply","AE","Continuous supply under reverse charge."],
+  ["380","Tax Invoice","00001000","Continuous Supply","Z","Continuous zero-rated supply."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","S","Agent invoices on behalf of principal at 5%. Principal ID (BTAE-14) mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","AE","Disclosed agent billing with reverse charge. Principal ID mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","Z","Disclosed agent billing for zero-rated supply. Principal ID mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","S","Online marketplace supply at 5%. Delivery address mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","AE","E-commerce supply under reverse charge. Delivery address mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","Z","E-commerce zero-rated supply. Delivery address mandatory."],
+  ["380","Tax Invoice","00000001","Exports","S","Export supply at 5%. Delivery address required unless country = AE."],
+  ["380","Tax Invoice","00000001","Exports","AE","Export under reverse charge. Delivery address required unless country = AE."],
+  ["380","Tax Invoice","00000001","Exports","Z","Export at 0%. Most common export scenario. Delivery address required unless country = AE."],
+  ["381","Tax Credit Note","00000000","Standard","S","Reversal of 5% VAT invoice. Reason code (BTAE-03) mandatory. Preceding invoice ref required."],
+  ["381","Tax Credit Note","00000000","Standard","AE","Reversal of reverse charge invoice. Reason code mandatory."],
+  ["381","Tax Credit Note","00000000","Standard","Z","Reversal of zero-rated invoice. Reason code mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","S","Credit note for FTZ supply at 5%. Beneficiary ID & reason code mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","AE","Credit note for FTZ reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","Z","Credit note for FTZ zero-rated supply. Reason code mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","S","Credit note for deemed supply at 5%. Reason code mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","AE","Credit note for deemed supply reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","Z","Credit note for deemed supply zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00100000","Profit Margin Scheme","N","Credit note for margin scheme supply. Only N allowed. Reason code mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","S","Credit note for summary invoice at 5%. Reason code mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","AE","Credit note for summary reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","Z","Credit note for summary zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","S","Credit note for continuous supply at 5%. Reason code mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","AE","Credit note for continuous reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","Z","Credit note for continuous zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","S","Credit note via disclosed agent at 5%. Principal ID & reason code mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","AE","Disclosed agent credit note, reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","Z","Disclosed agent credit note, zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","S","Credit note for e-commerce 5% supply. Reason code mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","AE","Credit note for e-commerce reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","Z","Credit note for e-commerce zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","S","Credit note for export at 5%. Reason code mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","AE","Credit note for export reverse charge. Reason code mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","Z","Credit note for export zero-rated. Reason code mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","S","Buyer-issued invoice at 5% VAT. CustomizationID = selfbilling-1@ae-1."],
+  ["389","Self-Billing Invoice","00000000","Standard","AE","Self-billing with reverse charge. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","Z","Self-billing zero-rated supply."],
+  ["389","Self-Billing Invoice","00000000","Standard","E","Self-billing exempt supply (e.g. residential lease). Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","O","Self-billing for supply outside scope (e.g. salary recharge)."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S","Self-billing FTZ supply at 5%. Beneficiary ID mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","AE","Self-billing FTZ reverse charge. Beneficiary ID mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","Z","Self-billing FTZ zero-rated."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","E","Self-billing FTZ exempt."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","O","Self-billing FTZ not subject to VAT."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S","Self-billing deemed supply at 5%."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","AE","Self-billing deemed supply reverse charge."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","Z","Self-billing deemed supply zero-rated."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","E","Self-billing deemed supply exempt."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","O","Self-billing deemed supply not subject to VAT."],
+  ["389","Self-Billing Invoice","00100000","Profit Margin Scheme","N","Self-billing margin scheme. Only N allowed."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S","Self-billing summary invoice at 5%. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","AE","Self-billing summary reverse charge. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","Z","Self-billing summary zero-rated. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","E","Self-billing summary exempt. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","O","Self-billing summary not-subject. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S","Self-billing continuous supply at 5%."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","AE","Self-billing continuous reverse charge."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","Z","Self-billing continuous zero-rated."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","E","Self-billing continuous exempt."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","O","Self-billing continuous not subject to VAT."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S","Self-billing via disclosed agent at 5%. Principal ID mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","AE","Self-billing disclosed agent reverse charge."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","Z","Self-billing disclosed agent zero-rated."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","E","Self-billing disclosed agent exempt."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","O","Self-billing disclosed agent not subject."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S","Self-billing e-commerce at 5%. Delivery address mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","AE","Self-billing e-commerce reverse charge."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","Z","Self-billing e-commerce zero-rated."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","E","Self-billing e-commerce exempt."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","O","Self-billing e-commerce not subject."],
+  ["389","Self-Billing Invoice","00000001","Exports","S","Self-billing export at 5%."],
+  ["389","Self-Billing Invoice","00000001","Exports","AE","Self-billing export reverse charge."],
+  ["389","Self-Billing Invoice","00000001","Exports","Z","Self-billing export zero-rated. Delivery address required unless country = AE."],
+  ["389","Self-Billing Invoice","00000001","Exports","E","Self-billing export exempt."],
+  ["389","Self-Billing Invoice","00000001","Exports","O","Self-billing export not subject to VAT."],
+  ["261","Self-Billing Credit Note","00000000","Standard","S","Buyer-issued CN reversing 5% self-billing invoice. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","AE","Self-billing CN for reverse charge. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","Z","Self-billing CN zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","E","Self-billing CN for exempt supply. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","O","Self-billing CN for out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S","Self-billing CN for FTZ at 5%. Beneficiary ID mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","AE","Self-billing CN for FTZ reverse charge."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","Z","Self-billing CN for FTZ zero-rated."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","E","Self-billing CN for FTZ exempt."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","O","Self-billing CN for FTZ not subject."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S","Self-billing CN for deemed supply at 5%."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","AE","Self-billing CN for deemed supply reverse charge."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","Z","Self-billing CN for deemed supply zero-rated."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","E","Self-billing CN for deemed supply exempt."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","O","Self-billing CN for deemed supply not subject."],
+  ["261","Self-Billing Credit Note","00100000","Profit Margin Scheme","N","Self-billing CN for margin scheme. Only N allowed. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S","Self-billing CN for summary invoice at 5%. Invoice period mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","AE","Self-billing CN for summary reverse charge."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","Z","Self-billing CN for summary zero-rated."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","E","Self-billing CN for summary exempt."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","O","Self-billing CN for summary not subject."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S","Self-billing CN for continuous supply at 5%."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","AE","Self-billing CN for continuous reverse charge."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","Z","Self-billing CN for continuous zero-rated."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","E","Self-billing CN for continuous exempt."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","O","Self-billing CN for continuous not subject."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S","Self-billing CN via disclosed agent at 5%. Principal ID mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","AE","Self-billing CN disclosed agent reverse charge."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","Z","Self-billing CN disclosed agent zero-rated."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","E","Self-billing CN disclosed agent exempt."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","O","Self-billing CN disclosed agent not subject."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S","Self-billing CN for e-commerce at 5%. Delivery address mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","AE","Self-billing CN e-commerce reverse charge."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","Z","Self-billing CN e-commerce zero-rated."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","E","Self-billing CN e-commerce exempt."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","O","Self-billing CN e-commerce not subject."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S","Self-billing CN for export at 5%."],
+  ["261","Self-Billing Credit Note","00000001","Exports","AE","Self-billing CN for export reverse charge."],
+  ["261","Self-Billing Credit Note","00000001","Exports","Z","Self-billing CN for export zero-rated."],
+  ["261","Self-Billing Credit Note","00000001","Exports","E","Self-billing CN for export exempt."],
+  ["261","Self-Billing Credit Note","00000001","Exports","O","Self-billing CN for export not subject."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","Z","Commercial invoice for zero-rated out-of-scope goods."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","E","Commercial invoice for exempt supply. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","O","Commercial invoice for non-taxable supply (e.g. salary recharge)."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","Z","Out-of-scope commercial invoice for FTZ zero-rated. Beneficiary ID mandatory."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","E","Out-of-scope commercial invoice for FTZ exempt."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","O","Out-of-scope commercial invoice for FTZ non-taxable."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","Z","Out-of-scope continuous supply, zero-rated."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","E","Out-of-scope continuous supply, exempt."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","O","Out-of-scope continuous supply, not subject."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","Z","Out-of-scope via disclosed agent, zero-rated. Principal ID mandatory."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","E","Out-of-scope via disclosed agent, exempt."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","O","Out-of-scope via disclosed agent, not subject."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","Z","Out-of-scope e-commerce, zero-rated. Delivery address mandatory."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","E","Out-of-scope e-commerce, exempt."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","O","Out-of-scope e-commerce, not subject."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","Z","Out-of-scope export, zero-rated. Delivery address required unless country = AE."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","E","Out-of-scope export, exempt."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","O","Out-of-scope export, not subject."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","Z","CN for out-of-scope zero-rated supply. Preceding invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","E","CN for exempt supply. Exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","O","CN for non-taxable supply."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","Z","CN for FTZ out-of-scope zero-rated. Beneficiary ID mandatory."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","E","CN for FTZ out-of-scope exempt."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","O","CN for FTZ out-of-scope not subject."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","Z","CN for out-of-scope continuous supply, zero-rated."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","E","CN for out-of-scope continuous, exempt."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","O","CN for out-of-scope continuous, not subject."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","Z","CN for out-of-scope disclosed agent, zero-rated. Principal ID mandatory."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","E","CN for out-of-scope disclosed agent, exempt."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","O","CN for out-of-scope disclosed agent, not subject."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","Z","CN for out-of-scope e-commerce, zero-rated."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","E","CN for out-of-scope e-commerce, exempt."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","O","CN for out-of-scope e-commerce, not subject."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","Z","CN for out-of-scope export, zero-rated."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","E","CN for out-of-scope export, exempt."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","O","CN for out-of-scope export, not subject."],
+
+  // ── 380 Tax Invoice — Multi-VAT combinations ──
+  ["380","Tax Invoice","00000000","Standard","S+Z","Mixed: standard-rated (5%) and zero-rated lines. Two TaxSubtotal blocks required."],
+  ["380","Tax Invoice","00000000","Standard","S+AE","Mixed: standard-rated and reverse-charge. Buyer VAT TRN (IBT-048) mandatory."],
+  ["380","Tax Invoice","00000000","Standard","AE+Z","Mixed: reverse-charge and zero-rated. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000000","Standard","S+AE+Z","Three-category: standard, reverse-charge, zero-rated. Three TaxSubtotal blocks. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","S+Z","FTZ mixed: standard and zero-rated. Beneficiary ID (BTAE-01) mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","S+AE","FTZ mixed: standard and reverse-charge. Beneficiary ID and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","AE+Z","FTZ mixed: reverse-charge and zero-rated. Beneficiary ID mandatory."],
+  ["380","Tax Invoice","10000000","Free Trade Zone","S+AE+Z","FTZ three-category. Beneficiary ID and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","01000000","Deemed Supply","S+Z","Deemed mixed: standard and zero-rated lines."],
+  ["380","Tax Invoice","01000000","Deemed Supply","S+AE","Deemed mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","01000000","Deemed Supply","AE+Z","Deemed mixed: reverse-charge and zero-rated."],
+  ["380","Tax Invoice","01000000","Deemed Supply","S+AE+Z","Deemed three-category. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","S+Z","Summary mixed: standard and zero-rated. Invoice period (IBG-14) mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","S+AE","Summary mixed: standard and reverse-charge. Invoice period and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","AE+Z","Summary mixed: reverse-charge and zero-rated. Invoice period mandatory."],
+  ["380","Tax Invoice","00010000","Summary Invoice","S+AE+Z","Summary three-category. Invoice period and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00001000","Continuous Supply","S+Z","Continuous mixed: standard and zero-rated."],
+  ["380","Tax Invoice","00001000","Continuous Supply","S+AE","Continuous mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00001000","Continuous Supply","AE+Z","Continuous mixed: reverse-charge and zero-rated."],
+  ["380","Tax Invoice","00001000","Continuous Supply","S+AE+Z","Continuous three-category. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","S+Z","Agent mixed: standard and zero-rated. Principal ID (BTAE-14) mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","S+AE","Agent mixed: standard and reverse-charge. Principal ID and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","AE+Z","Agent mixed: reverse-charge and zero-rated. Principal ID mandatory."],
+  ["380","Tax Invoice","00000100","Disclosed Agent Billing","S+AE+Z","Agent three-category. Principal ID and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","S+Z","E-commerce mixed: standard and zero-rated. Delivery address mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","S+AE","E-commerce mixed: standard and reverse-charge. Delivery address and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","AE+Z","E-commerce mixed: reverse-charge and zero-rated. Delivery address mandatory."],
+  ["380","Tax Invoice","00000010","E-commerce","S+AE+Z","E-commerce three-category. Delivery address and Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000001","Exports","S+Z","Export mixed: standard and zero-rated. Delivery address required unless country = AE."],
+  ["380","Tax Invoice","00000001","Exports","S+AE","Export mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["380","Tax Invoice","00000001","Exports","AE+Z","Export mixed: reverse-charge and zero-rated. Delivery address required."],
+  ["380","Tax Invoice","00000001","Exports","S+AE+Z","Export three-category. Delivery address and Buyer VAT TRN mandatory."],
+
+  // ── 381 Tax Credit Note — Multi-VAT combinations ──
+  ["381","Tax Credit Note","00000000","Standard","S+Z","CN mixed: standard and zero-rated. Reason code (BTAE-03) mandatory."],
+  ["381","Tax Credit Note","00000000","Standard","S+AE","CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000000","Standard","AE+Z","CN mixed: reverse-charge and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000000","Standard","S+AE+Z","CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","S+Z","FTZ CN mixed: standard and zero-rated. Beneficiary ID and reason code mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","S+AE","FTZ CN mixed: standard and reverse-charge. Beneficiary ID, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","AE+Z","FTZ CN mixed: reverse-charge and zero-rated. Beneficiary ID and reason code mandatory."],
+  ["381","Tax Credit Note","10000000","Free Trade Zone","S+AE+Z","FTZ CN three-category. Beneficiary ID, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","S+Z","Deemed CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","S+AE","Deemed CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","AE+Z","Deemed CN mixed: reverse-charge and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","01000000","Deemed Supply","S+AE+Z","Deemed CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","S+Z","Summary CN mixed: standard and zero-rated. Invoice period and reason code mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","S+AE","Summary CN mixed: standard and reverse-charge. Invoice period, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","AE+Z","Summary CN mixed: reverse-charge and zero-rated. Invoice period and reason code mandatory."],
+  ["381","Tax Credit Note","00010000","Summary Invoice","S+AE+Z","Summary CN three-category. Invoice period, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","S+Z","Continuous CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","S+AE","Continuous CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","AE+Z","Continuous CN mixed: reverse-charge and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00001000","Continuous Supply","S+AE+Z","Continuous CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","S+Z","Agent CN mixed: standard and zero-rated. Principal ID and reason code mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","S+AE","Agent CN mixed: standard and reverse-charge. Principal ID, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","AE+Z","Agent CN mixed: reverse-charge and zero-rated. Principal ID and reason code mandatory."],
+  ["381","Tax Credit Note","00000100","Disclosed Agent Billing","S+AE+Z","Agent CN three-category. Principal ID, reason code, Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","S+Z","E-commerce CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","S+AE","E-commerce CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","AE+Z","E-commerce CN mixed: reverse-charge and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000010","E-commerce","S+AE+Z","E-commerce CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","S+Z","Export CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","S+AE","Export CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","AE+Z","Export CN mixed: reverse-charge and zero-rated. Reason code mandatory."],
+  ["381","Tax Credit Note","00000001","Exports","S+AE+Z","Export CN three-category. Reason code and Buyer VAT TRN mandatory."],
+
+  // ── 389 Self-Billing Invoice — Multi-VAT combinations ──
+  ["389","Self-Billing Invoice","00000000","Standard","S+Z","Self-billing mixed: standard and zero-rated."],
+  ["389","Self-Billing Invoice","00000000","Standard","S+AE","Self-billing mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","S+E","Self-billing mixed: standard and exempt. Exemption reason mandatory for E lines."],
+  ["389","Self-Billing Invoice","00000000","Standard","S+O","Self-billing mixed: standard and out-of-scope."],
+  ["389","Self-Billing Invoice","00000000","Standard","AE+Z","Self-billing mixed: reverse-charge and zero-rated. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","Z+E","Self-billing mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000000","Standard","Z+O","Self-billing mixed: zero-rated and out-of-scope."],
+  ["389","Self-Billing Invoice","00000000","Standard","S+AE+Z","Self-billing three-category: standard, reverse-charge, zero-rated. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S+Z","Self-billing FTZ mixed: standard and zero-rated. Beneficiary ID mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S+AE","Self-billing FTZ mixed: standard and reverse-charge. Beneficiary ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S+E","Self-billing FTZ mixed: standard and exempt. Beneficiary ID and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S+O","Self-billing FTZ mixed: standard and out-of-scope. Beneficiary ID mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","AE+Z","Self-billing FTZ mixed: reverse-charge and zero-rated. Beneficiary ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","Z+E","Self-billing FTZ mixed: zero-rated and exempt. Beneficiary ID and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","Z+O","Self-billing FTZ mixed: zero-rated and out-of-scope. Beneficiary ID mandatory."],
+  ["389","Self-Billing Invoice","10000000","Free Trade Zone","S+AE+Z","Self-billing FTZ three-category. Beneficiary ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S+Z","Self-billing deemed mixed: standard and zero-rated."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S+AE","Self-billing deemed mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S+E","Self-billing deemed mixed: standard and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S+O","Self-billing deemed mixed: standard and out-of-scope."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","AE+Z","Self-billing deemed mixed: reverse-charge and zero-rated. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","Z+E","Self-billing deemed mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","Z+O","Self-billing deemed mixed: zero-rated and out-of-scope."],
+  ["389","Self-Billing Invoice","01000000","Deemed Supply","S+AE+Z","Self-billing deemed three-category. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S+Z","Self-billing summary mixed: standard and zero-rated. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S+AE","Self-billing summary mixed: standard and reverse-charge. Invoice period and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S+E","Self-billing summary mixed: standard and exempt. Invoice period and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S+O","Self-billing summary mixed: standard and out-of-scope. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","AE+Z","Self-billing summary mixed: reverse-charge and zero-rated. Invoice period and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","Z+E","Self-billing summary mixed: zero-rated and exempt. Invoice period and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","Z+O","Self-billing summary mixed: zero-rated and out-of-scope. Invoice period mandatory."],
+  ["389","Self-Billing Invoice","00010000","Summary Invoice","S+AE+Z","Self-billing summary three-category. Invoice period and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S+Z","Self-billing continuous mixed: standard and zero-rated."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S+AE","Self-billing continuous mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S+E","Self-billing continuous mixed: standard and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S+O","Self-billing continuous mixed: standard and out-of-scope."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","AE+Z","Self-billing continuous mixed: reverse-charge and zero-rated. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","Z+E","Self-billing continuous mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","Z+O","Self-billing continuous mixed: zero-rated and out-of-scope."],
+  ["389","Self-Billing Invoice","00001000","Continuous Supply","S+AE+Z","Self-billing continuous three-category. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S+Z","Self-billing agent mixed: standard and zero-rated. Principal ID mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S+AE","Self-billing agent mixed: standard and reverse-charge. Principal ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S+E","Self-billing agent mixed: standard and exempt. Principal ID and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S+O","Self-billing agent mixed: standard and out-of-scope. Principal ID mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","AE+Z","Self-billing agent mixed: reverse-charge and zero-rated. Principal ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","Z+E","Self-billing agent mixed: zero-rated and exempt. Principal ID and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","Z+O","Self-billing agent mixed: zero-rated and out-of-scope. Principal ID mandatory."],
+  ["389","Self-Billing Invoice","00000100","Disclosed Agent Billing","S+AE+Z","Self-billing agent three-category. Principal ID and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S+Z","Self-billing e-commerce mixed: standard and zero-rated. Delivery address mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S+AE","Self-billing e-commerce mixed: standard and reverse-charge. Delivery address and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S+E","Self-billing e-commerce mixed: standard and exempt. Delivery address and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S+O","Self-billing e-commerce mixed: standard and out-of-scope. Delivery address mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","AE+Z","Self-billing e-commerce mixed: reverse-charge and zero-rated. Delivery address and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","Z+E","Self-billing e-commerce mixed: zero-rated and exempt. Delivery address and exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","Z+O","Self-billing e-commerce mixed: zero-rated and out-of-scope. Delivery address mandatory."],
+  ["389","Self-Billing Invoice","00000010","E-commerce","S+AE+Z","Self-billing e-commerce three-category. Delivery address and Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000001","Exports","S+Z","Self-billing export mixed: standard and zero-rated. Delivery address required unless country = AE."],
+  ["389","Self-Billing Invoice","00000001","Exports","S+AE","Self-billing export mixed: standard and reverse-charge. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000001","Exports","S+E","Self-billing export mixed: standard and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000001","Exports","S+O","Self-billing export mixed: standard and out-of-scope."],
+  ["389","Self-Billing Invoice","00000001","Exports","AE+Z","Self-billing export mixed: reverse-charge and zero-rated. Buyer VAT TRN mandatory."],
+  ["389","Self-Billing Invoice","00000001","Exports","Z+E","Self-billing export mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["389","Self-Billing Invoice","00000001","Exports","Z+O","Self-billing export mixed: zero-rated and out-of-scope."],
+  ["389","Self-Billing Invoice","00000001","Exports","S+AE+Z","Self-billing export three-category. Buyer VAT TRN mandatory."],
+
+  // ── 261 Self-Billing Credit Note — Multi-VAT combinations ──
+  ["261","Self-Billing Credit Note","00000000","Standard","S+Z","Self-billing CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","S+AE","Self-billing CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","S+E","Self-billing CN mixed: standard and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","S+O","Self-billing CN mixed: standard and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","AE+Z","Self-billing CN mixed: reverse-charge and zero-rated. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","Z+E","Self-billing CN mixed: zero-rated and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","Z+O","Self-billing CN mixed: zero-rated and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000000","Standard","S+AE+Z","Self-billing CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S+Z","Self-billing FTZ CN mixed: standard and zero-rated. Beneficiary ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S+AE","Self-billing FTZ CN mixed: standard and reverse-charge. Beneficiary ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S+E","Self-billing FTZ CN mixed: standard and exempt. Beneficiary ID, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S+O","Self-billing FTZ CN mixed: standard and out-of-scope. Beneficiary ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","AE+Z","Self-billing FTZ CN mixed: reverse-charge and zero-rated. Beneficiary ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","Z+E","Self-billing FTZ CN mixed: zero-rated and exempt. Beneficiary ID, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","Z+O","Self-billing FTZ CN mixed: zero-rated and out-of-scope. Beneficiary ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","10000000","Free Trade Zone","S+AE+Z","Self-billing FTZ CN three-category. Beneficiary ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S+Z","Self-billing deemed CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S+AE","Self-billing deemed CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S+E","Self-billing deemed CN mixed: standard and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S+O","Self-billing deemed CN mixed: standard and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","AE+Z","Self-billing deemed CN mixed: reverse-charge and zero-rated. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","Z+E","Self-billing deemed CN mixed: zero-rated and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","Z+O","Self-billing deemed CN mixed: zero-rated and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","01000000","Deemed Supply","S+AE+Z","Self-billing deemed CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S+Z","Self-billing summary CN mixed: standard and zero-rated. Invoice period and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S+AE","Self-billing summary CN mixed: standard and reverse-charge. Invoice period, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S+E","Self-billing summary CN mixed: standard and exempt. Invoice period, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S+O","Self-billing summary CN mixed: standard and out-of-scope. Invoice period and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","AE+Z","Self-billing summary CN mixed: reverse-charge and zero-rated. Invoice period, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","Z+E","Self-billing summary CN mixed: zero-rated and exempt. Invoice period, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","Z+O","Self-billing summary CN mixed: zero-rated and out-of-scope. Invoice period and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00010000","Summary Invoice","S+AE+Z","Self-billing summary CN three-category. Invoice period, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S+Z","Self-billing continuous CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S+AE","Self-billing continuous CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S+E","Self-billing continuous CN mixed: standard and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S+O","Self-billing continuous CN mixed: standard and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","AE+Z","Self-billing continuous CN mixed: reverse-charge and zero-rated. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","Z+E","Self-billing continuous CN mixed: zero-rated and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","Z+O","Self-billing continuous CN mixed: zero-rated and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00001000","Continuous Supply","S+AE+Z","Self-billing continuous CN three-category. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S+Z","Self-billing agent CN mixed: standard and zero-rated. Principal ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S+AE","Self-billing agent CN mixed: standard and reverse-charge. Principal ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S+E","Self-billing agent CN mixed: standard and exempt. Principal ID, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S+O","Self-billing agent CN mixed: standard and out-of-scope. Principal ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","AE+Z","Self-billing agent CN mixed: reverse-charge and zero-rated. Principal ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","Z+E","Self-billing agent CN mixed: zero-rated and exempt. Principal ID, reason code, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","Z+O","Self-billing agent CN mixed: zero-rated and out-of-scope. Principal ID and reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000100","Disclosed Agent Billing","S+AE+Z","Self-billing agent CN three-category. Principal ID, reason code, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S+Z","Self-billing e-commerce CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S+AE","Self-billing e-commerce CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S+E","Self-billing e-commerce CN mixed: standard and exempt. Reason code, delivery address, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S+O","Self-billing e-commerce CN mixed: standard and out-of-scope. Reason code and delivery address mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","AE+Z","Self-billing e-commerce CN mixed: reverse-charge and zero-rated. Reason code, delivery address, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","Z+E","Self-billing e-commerce CN mixed: zero-rated and exempt. Reason code, delivery address, exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","Z+O","Self-billing e-commerce CN mixed: zero-rated and out-of-scope. Reason code and delivery address mandatory."],
+  ["261","Self-Billing Credit Note","00000010","E-commerce","S+AE+Z","Self-billing e-commerce CN three-category. Reason code, delivery address, Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S+Z","Self-billing export CN mixed: standard and zero-rated. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S+AE","Self-billing export CN mixed: standard and reverse-charge. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S+E","Self-billing export CN mixed: standard and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S+O","Self-billing export CN mixed: standard and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","AE+Z","Self-billing export CN mixed: reverse-charge and zero-rated. Reason code and Buyer VAT TRN mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","Z+E","Self-billing export CN mixed: zero-rated and exempt. Reason code and exemption reason mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","Z+O","Self-billing export CN mixed: zero-rated and out-of-scope. Reason code mandatory."],
+  ["261","Self-Billing Credit Note","00000001","Exports","S+AE+Z","Self-billing export CN three-category. Reason code and Buyer VAT TRN mandatory."],
+
+  // ── 480 Invoice (Out of Scope) — Multi-VAT combinations ──
+  ["480","Invoice (Out of Scope)","00000000","Standard","Z+E","Out-of-scope mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","Z+O","Out-of-scope mixed: zero-rated and not subject to VAT."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","E+O","Out-of-scope mixed: exempt and not subject. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000000","Standard","Z+E+O","Out-of-scope three-category: zero-rated, exempt, not subject. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","Z+E","Out-of-scope FTZ mixed: zero-rated and exempt. Beneficiary ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","Z+O","Out-of-scope FTZ mixed: zero-rated and not subject. Beneficiary ID mandatory."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","E+O","Out-of-scope FTZ mixed: exempt and not subject. Beneficiary ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","10000000","Free Trade Zone","Z+E+O","Out-of-scope FTZ three-category. Beneficiary ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","Z+E","Out-of-scope continuous mixed: zero-rated and exempt. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","Z+O","Out-of-scope continuous mixed: zero-rated and not subject."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","E+O","Out-of-scope continuous mixed: exempt and not subject. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00001000","Continuous Supply","Z+E+O","Out-of-scope continuous three-category. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","Z+E","Out-of-scope agent mixed: zero-rated and exempt. Principal ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","Z+O","Out-of-scope agent mixed: zero-rated and not subject. Principal ID mandatory."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","E+O","Out-of-scope agent mixed: exempt and not subject. Principal ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000100","Disclosed Agent Billing","Z+E+O","Out-of-scope agent three-category. Principal ID and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","Z+E","Out-of-scope e-commerce mixed: zero-rated and exempt. Delivery address and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","Z+O","Out-of-scope e-commerce mixed: zero-rated and not subject. Delivery address mandatory."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","E+O","Out-of-scope e-commerce mixed: exempt and not subject. Delivery address and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000010","E-commerce","Z+E+O","Out-of-scope e-commerce three-category. Delivery address and exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","Z+E","Out-of-scope export mixed: zero-rated and exempt. Delivery address required unless country = AE. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","Z+O","Out-of-scope export mixed: zero-rated and not subject. Delivery address required unless country = AE."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","E+O","Out-of-scope export mixed: exempt and not subject. Exemption reason mandatory."],
+  ["480","Invoice (Out of Scope)","00000001","Exports","Z+E+O","Out-of-scope export three-category. Delivery address and exemption reason mandatory."],
+
+  // ── 81 Credit Note (Out of Scope) — Multi-VAT combinations ──
+  ["81","Credit Note (Out of Scope)","00000000","Standard","Z+E","Out-of-scope CN mixed: zero-rated and exempt. Preceding invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","Z+O","Out-of-scope CN mixed: zero-rated and not subject. Preceding invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","E+O","Out-of-scope CN mixed: exempt and not subject. Preceding invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000000","Standard","Z+E+O","Out-of-scope CN three-category. Preceding invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","Z+E","Out-of-scope FTZ CN mixed: zero-rated and exempt. Beneficiary ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","Z+O","Out-of-scope FTZ CN mixed: zero-rated and not subject. Beneficiary ID and invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","E+O","Out-of-scope FTZ CN mixed: exempt and not subject. Beneficiary ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","10000000","Free Trade Zone","Z+E+O","Out-of-scope FTZ CN three-category. Beneficiary ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","Z+E","Out-of-scope continuous CN mixed: zero-rated and exempt. Invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","Z+O","Out-of-scope continuous CN mixed: zero-rated and not subject. Invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","E+O","Out-of-scope continuous CN mixed: exempt and not subject. Invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00001000","Continuous Supply","Z+E+O","Out-of-scope continuous CN three-category. Invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","Z+E","Out-of-scope agent CN mixed: zero-rated and exempt. Principal ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","Z+O","Out-of-scope agent CN mixed: zero-rated and not subject. Principal ID and invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","E+O","Out-of-scope agent CN mixed: exempt and not subject. Principal ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000100","Disclosed Agent Billing","Z+E+O","Out-of-scope agent CN three-category. Principal ID, invoice ref, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","Z+E","Out-of-scope e-commerce CN mixed: zero-rated and exempt. Invoice ref, delivery address, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","Z+O","Out-of-scope e-commerce CN mixed: zero-rated and not subject. Invoice ref and delivery address mandatory."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","E+O","Out-of-scope e-commerce CN mixed: exempt and not subject. Invoice ref, delivery address, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000010","E-commerce","Z+E+O","Out-of-scope e-commerce CN three-category. Invoice ref, delivery address, exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","Z+E","Out-of-scope export CN mixed: zero-rated and exempt. Invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","Z+O","Out-of-scope export CN mixed: zero-rated and not subject. Invoice ref mandatory."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","E+O","Out-of-scope export CN mixed: exempt and not subject. Invoice ref and exemption reason mandatory."],
+  ["81","Credit Note (Out of Scope)","00000001","Exports","Z+E+O","Out-of-scope export CN three-category. Invoice ref and exemption reason mandatory."],
+];
+
+function renderT1() {
+  const fd = document.getElementById('fDoc').value;
+  const ft = document.getElementById('fTxn').value;
+  const fv = document.getElementById('fVat').value;
+  const rows = T1DATA.filter(r => {
+    if (fd && r[0] !== fd) return false;
+    if (ft && r[2] !== ft) return false;
+    if (fv && !r[4].split('+').includes(fv)) return false;
+    return true;
+  });
+  document.getElementById('t1count').textContent = rows.length + ' combination' + (rows.length !== 1 ? 's' : '');
+  const tb = document.getElementById('t1body');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5" class="empty-row">No combinations match</td></tr>'; return; }
+  tb.innerHTML = rows.map(r => `<tr>
+    <td><span class="pill doc-${r[0]}">${r[0]}</span></td>
+    <td style="font-size:12px;color:var(--text)">${r[1]}</td>
+    <td><span class="txn-badge">${r[2]}</span><span class="txn-name">${r[3]}</span></td>
+    <td style="white-space:nowrap">${r[4].split('+').map(v=>`<span class="pill vat-${v}">${v}</span>`).join(' ')}</td>
+    <td class="note-text">${r[5]}</td>
+  </tr>`).join('');
+}
+renderT1();
+
+/* ═══════════════════════════════════════
+   TAB 2 DATA — EDGE CASES & MULTI-VAT
+   ═══════════════════════════════════════ */
+const EDGE_CATS = [
+  {id:'all',      label:'All',                    cls:''},
+  {id:'multi',    label:'Multiple VAT categories', cls:'active-multi'},
+  {id:'currency', label:'Non-AED / foreign currency', cls:'active-currency'},
+  {id:'calc',     label:'Calculation & rounding',  cls:'active-calc'},
+  {id:'edge',     label:'Edge cases',              cls:'active-edge'},
+  {id:'neg',      label:'Invalid / negative',      cls:'active-neg'},
+];
+
+const EDGE_DATA = [
+  {cat:'multi', valid:true,
+   title:'S + Z on same invoice (380)',
+   tags:['multi'],
+   desc:'One line at 5% (S), another at 0% (Z). Requires two TaxSubtotal blocks in TaxTotal — one per category. Both lines can co-exist on a 380 Tax Invoice.',
+   rules:['aligned-ibrp-s-01','aligned-ibrp-z-01','aligned-ibrp-s-08','aligned-ibrp-z-08'],
+   conditions:['Two cac:TaxSubtotal blocks: one for S, one for Z','S TaxAmount = S-taxable × 5%','Z TaxAmount = 0; rate must be explicitly 0','Each subtotal aggregates only its own category lines']},
+
+  {cat:'multi', valid:true,
+   title:'S + AE on same invoice (380)',
+   tags:['multi'],
+   desc:'Mixed supply: some lines at 5% standard rate, other lines under reverse charge. Buyer VAT TRN (IBT-048) is mandatory because AE lines are present.',
+   rules:['aligned-ibrp-s-01','aligned-ibrp-ae-01-ae','ibr-103-ae'],
+   conditions:['Two TaxSubtotal blocks: one S, one AE','AE TaxAmount = 0 (buyer accounts for VAT)','Buyer IBT-048 (VAT TRN) mandatory','S TaxAmount = S-lines taxable × 5%']},
+
+  {cat:'multi', valid:true,
+   title:'S + Z + AE on same invoice (380)',
+   tags:['multi'],
+   desc:'Three-category invoice: standard-rated, zero-rated, and reverse-charge lines on the same document. Three TaxSubtotal blocks required.',
+   rules:['aligned-ibrp-s-01','aligned-ibrp-z-01','aligned-ibrp-ae-01-ae'],
+   conditions:['Three TaxSubtotal blocks: S, Z, AE','Buyer IBT-048 mandatory (AE present)','Each subtotal sums only its own category lines, allowances, charges','Total TaxAmount = S-amount only (Z and AE both = 0)']},
+
+  {cat:'multi', valid:true,
+   title:'S + E on same invoice (389 / 261 only)',
+   tags:['multi'],
+   desc:'Self-billing invoices (389, 261) can mix standard-rated and exempt lines. Not allowed on 380/381 as the sole categories — but valid when S is also present.',
+   rules:['aligned-ibrp-s-01','aligned-ibrp-e-01','ibr-151-ae','ibr-163-ae'],
+   conditions:['389/261 only — E alone on 380/381 is invalid (ibr-151-ae)','Two TaxSubtotal blocks: S and E','E TaxAmount = 0; rate NOT provided in E subtotal','E lines: BTAE-08 must NOT be present (ibr-163-ae)','Exemption reason code mandatory for E breakdown']},
+
+  {cat:'multi', valid:true,
+   title:'Z + E on same invoice (480)',
+   tags:['multi'],
+   desc:'Out-of-scope commercial invoice (480) with both zero-rated and exempt lines. Both categories are permitted on 480.',
+   rules:['aligned-ibrp-z-01','aligned-ibrp-e-01','ibr-122-ae'],
+   conditions:['Two TaxSubtotal blocks: Z and E','Z TaxAmount = 0; rate = 0','E TaxAmount = 0; no rate','Exemption reason code required for E']},
+
+  {cat:'multi', valid:false,
+   title:'S + N on same invoice — INVALID',
+   tags:['multi','neg'],
+   desc:'Margin Scheme (BTAE-02 = XX1XXXXX) forces the entire invoice to use only VAT code N. Mixing N with S, Z, AE, E, or O is a fatal violation.',
+   rules:['ibr-116-ae'],
+   conditions:['ibr-116-ae checks both TaxCategory/cbc:ID and ClassifiedTaxCategory/cbc:ID','Any non-N code anywhere on the document = fatal error','The entire document must be N — no mixing whatsoever']},
+
+  {cat:'multi', valid:false,
+   title:'E or O as sole VAT on 380/381 — INVALID',
+   tags:['multi','neg'],
+   desc:'A Tax Invoice (380) or Tax Credit Note (381) must have at least one line with a VAT category other than E or O. A document with only exempt or out-of-scope lines must use 480/81 instead.',
+   rules:['ibr-151-ae'],
+   conditions:['At least one line must be S, AE, Z, or N on 380/381','Use 480/81 for purely exempt or out-of-scope documents','E and O are freely usable on 389, 261, 480, 81']},
+
+  {cat:'currency', valid:true,
+   title:'Invoice in USD, VAT reported in AED',
+   tags:['currency'],
+   desc:'The most common foreign-currency scenario in UAE. Invoice amounts are in USD; VAT must be reported in AED. Requires a precise four-piece structure.',
+   rules:['ibr-159-ae','ibr-140-ae','ibr-153-ae','ibr-175-ae','ibr-053','ibr-077'],
+   conditions:['DocumentCurrencyCode = USD','TaxCurrencyCode = AED (ibr-140-ae: must be AED when present)','TaxExchangeRate/CalculationRate (BTAE-04) mandatory (ibr-159-ae)','First cac:TaxTotal: TaxAmount in USD (doc currency)','Second cac:TaxTotal: TaxAmount in AED = IBT-111','LegalMonetaryTotal: all amounts in USD','BTAE-20: Invoice total with VAT in AED mandatory (ibr-175-ae)','IBT-006 must differ from IBT-005 (ibr-077)','Exchange rate max 6 decimal places (ibr-002-ae)','BTAE-08 and BTAE-10 per line always in AED regardless']},
+
+  {cat:'currency', valid:true,
+   title:'Invoice in EUR, VAT reported in AED',
+   tags:['currency'],
+   desc:'Identical pattern to USD. Any non-AED invoice currency triggers the same dual-TaxTotal and exchange rate requirements.',
+   rules:['ibr-159-ae','ibr-175-ae','ibr-002-ae'],
+   conditions:['DocumentCurrencyCode = EUR (or any valid ISO 4217 non-AED code)','TaxCurrencyCode = AED','BTAE-04 exchange rate required, max 6 decimal places','Two TaxTotal blocks (EUR amounts + AED amounts)','BTAE-20 required']},
+
+  {cat:'currency', valid:false,
+   title:'Non-AED invoice without exchange rate — INVALID',
+   tags:['currency','neg'],
+   desc:'If DocumentCurrencyCode ≠ AED and no TaxExchangeRate/CalculationRate (BTAE-04) is provided, the document fails ibr-159-ae.',
+   rules:['ibr-159-ae'],
+   conditions:['ibr-159-ae: BTAE-04 is mandatory when IBT-005 ≠ AED','Missing exchange rate = fatal error']},
+
+  {cat:'currency', valid:false,
+   title:'TaxCurrencyCode set to anything other than AED — INVALID',
+   tags:['currency','neg'],
+   desc:'The tax accounting currency in UAE must always be AED. Setting TaxCurrencyCode to USD, EUR, or any other currency is a fatal violation.',
+   rules:['ibr-140-ae'],
+   conditions:['ibr-140-ae: IBT-006 must equal AED when present','Any non-AED value = fatal']},
+
+  {cat:'currency', valid:false,
+   title:'TaxCurrencyCode provided on an AED invoice — INVALID',
+   tags:['currency','neg'],
+   desc:'When DocumentCurrencyCode is already AED, TaxCurrencyCode must be omitted. It must always differ from the document currency when provided.',
+   rules:['ibr-077'],
+   conditions:['ibr-077: IBT-006 must differ from IBT-005 when provided','If IBT-005 = AED, omit IBT-006 entirely','Providing IBT-006 = AED on an AED invoice = fatal']},
+
+  {cat:'currency', valid:false,
+   title:'Non-AED invoice, second TaxTotal (AED) missing — INVALID',
+   tags:['currency','neg'],
+   desc:'When the invoice currency is non-AED and TaxCurrencyCode = AED, both IBT-111 (second TaxTotal) and BTAE-20 (total with VAT in AED) must be present.',
+   rules:['ibr-053','ibr-175-ae'],
+   conditions:['ibr-053: if IBT-006 present, IBT-111 must be provided','ibr-175-ae: both IBT-111 and BTAE-20 required when IBT-005 ≠ AED and IBT-006 = AED','Both fields must have same sign as IBT-110 (ibr-084)']},
+
+  {cat:'calc', valid:true,
+   title:'VAT tax amount calculation with rounding tolerance',
+   tags:['calc'],
+   desc:'S-category VAT amounts use a slack tolerance (u:slack). A rounding difference of ±0.01 is accepted. Prevents failures from currency conversion rounding.',
+   rules:['aligned-ibrp-s-09'],
+   conditions:['VAT amount must be within tolerance of TaxableAmount × (Rate÷100)','Use standard half-up rounding to 2 decimal places','Tolerance accommodates AED/foreign-currency conversion rounding','Z and AE amounts must be exactly 0 — no tolerance']},
+
+  {cat:'calc', valid:true,
+   title:'Line net amount with allowance and charge',
+   tags:['calc'],
+   desc:'IBT-131 (LineExtensionAmount) = (InvoicedQuantity × PriceAmount ÷ BaseQuantity) + LineCharges − LineAllowances. All three components can exist simultaneously on the same line.',
+   rules:['ibr-147-ae','ibr-087'],
+   conditions:['ibr-147-ae: LineExtensionAmount must satisfy the formula exactly','BaseQuantity (IBT-149) must be positive non-zero (ibr-087)','PriceAmount is the net price after any item-level discount','Gross price (IBT-148) = net price when no discount; both always mandatory']},
+
+  {cat:'calc', valid:true,
+   title:'Document-level allowance with percentage base',
+   tags:['calc'],
+   desc:'When a document-level allowance or charge includes a BaseAmount and Percent, the Amount must equal BaseAmount × Percent ÷ 100 exactly.',
+   rules:['ibr-131-ae','ibr-146-ae'],
+   conditions:['ibr-131-ae: AllowanceCharge Amount = BaseAmount × Percent ÷ 100','ibr-146-ae: same rule for charges','VAT code N is NOT allowed on doc-level allowances or charges (ibr-114-ae, ibr-115-ae)','VAT category on allowance/charge must match the lines it relates to']},
+
+  {cat:'calc', valid:true,
+   title:'Monetary totals cross-validation',
+   tags:['calc'],
+   desc:'All LegalMonetaryTotal fields are cross-validated by the schematron. Every formula must balance exactly with no tolerance.',
+   rules:['ibr-co-10','ibr-co-11','ibr-co-12','ibr-co-13','ibr-co-15','ibr-co-16'],
+   conditions:['IBT-106 = Σ IBT-131 (all line net amounts)','IBT-107 = Σ IBT-092 (all doc-level allowances)','IBT-108 = Σ IBT-099 (all doc-level charges)','IBT-109 = IBT-106 − IBT-107 + IBT-108','IBT-112 = IBT-109 + IBT-110','IBT-115 = IBT-112 − IBT-113 (prepaid) + IBT-114 (rounding)']},
+
+  {cat:'calc', valid:false,
+   title:'Monetary amount with more than 2 decimal places — INVALID',
+   tags:['calc','neg'],
+   desc:'Six monetary total fields are restricted to maximum 2 decimal places. A value like 1050.125 on any of these is a fatal error.',
+   rules:['ibr-091','ibr-121','ibr-122','ibr-123','ibr-124','ibr-125'],
+   conditions:['IBT-115 PayableAmount: max 2 decimals (ibr-091)','IBT-107 AllowanceTotal: max 2 decimals (ibr-121)','IBT-108 ChargeTotal: max 2 decimals (ibr-122)','IBT-109 TaxExclusiveAmount: max 2 decimals (ibr-123)','IBT-110 TaxAmount: max 2 decimals (ibr-124)','IBT-112 TaxInclusiveAmount: max 2 decimals (ibr-125)']},
+
+  {cat:'edge', valid:true,
+   title:'PayableAmount = 0 (fully prepaid invoice)',
+   tags:['edge'],
+   desc:'When the entire amount is prepaid (IBT-113 = IBT-112), PayableAmount (IBT-115) = 0. DueDate is not required in this case.',
+   rules:['ibr-127-ae','ibr-co-16'],
+   conditions:['ibr-127-ae: DueDate required only when IBT-115 > 0','IBT-115 = 0 is valid; omit DueDate','Prepaid amount (IBT-113) must not exceed IBT-112','Rounding amount (IBT-114) can still be applied']},
+
+  {cat:'edge', valid:true,
+   title:'Rounding amount adjustment (IBT-114)',
+   tags:['edge'],
+   desc:'A small rounding amount can adjust PayableAmount to a round number. Can be positive or negative. Feeds directly into the PayableAmount formula.',
+   rules:['ibr-co-16'],
+   conditions:['IBT-115 = IBT-112 − IBT-113 + IBT-114','IBT-114 can be positive or negative','No absolute limit in schematron — convention is ±0.99 max','Commonly used when foreign-currency conversion creates sub-cent fractions']},
+
+  {cat:'edge', valid:true,
+   title:'BTAE-08 on a Z line: present but zero',
+   tags:['edge'],
+   desc:'For zero-rated lines, BTAE-08 (VAT line amount in AED) must be present and equal exactly zero. This is the opposite of E/O lines where BTAE-08 must be absent.',
+   rules:['ibr-165-ae','ibr-104-ae'],
+   conditions:['ibr-165-ae: BTAE-08 present for Z lines but value must be 0','BTAE-10 (line payable in AED) must also be present','Both always expressed in AED regardless of invoice currency']},
+
+  {cat:'edge', valid:true,
+   title:'BTAE-08 on an E or O line: must be absent',
+   tags:['edge'],
+   desc:'For exempt (E) and out-of-scope (O) lines, BTAE-08 must NOT appear at all. The opposite rule to Z. Confusing the two is a common implementation error.',
+   rules:['ibr-163-ae','ibr-104-ae'],
+   conditions:['ibr-163-ae: BTAE-08 must NOT appear when IBT-151 = E','Same applies to O category lines','BTAE-10 also not required for E/O lines','Summary: Z → BTAE-08 present but 0; E/O → BTAE-08 absent entirely']},
+
+  {cat:'edge', valid:true,
+   title:'Credit note with reason code VD (volume discount)',
+   tags:['edge'],
+   desc:'The only credit note type that does NOT require a preceding invoice reference. VD stands for volume discount and the credit note stands alone without a BillingReference.',
+   rules:['ibr-130-ae'],
+   conditions:['Reason code = VD: BillingReference/InvoiceDocumentReference not required','All other reason codes: BillingReference is mandatory','BTAE-03 (reason code) is always mandatory on ALL credit notes','VD applies to 381, 261, and 81']},
+
+  {cat:'edge', valid:true,
+   title:'Summary invoice: InvoicePeriod mandatory',
+   tags:['edge'],
+   desc:'Summary Invoice (BTAE-02 = XXX1XXXX) must always include an InvoicePeriod with StartDate and EndDate covering the period of the consolidated supplies.',
+   rules:['ibr-141-ae'],
+   conditions:['cac:InvoicePeriod/cbc:StartDate and cbc:EndDate required','TaxPointDate (IBT-007): use the latest supply date in the period','IBT-007 must still precede IssueDate']},
+
+  {cat:'edge', valid:true,
+   title:'Gross price equals net price when no discount',
+   tags:['edge'],
+   desc:'When no item-level price discount exists, IBT-148 (gross price BaseAmount) must equal IBT-146 (net PriceAmount). Both fields are always mandatory per ibr-126-ae.',
+   rules:['ibr-126-ae','aligned-ibrp-004'],
+   conditions:['ibr-126-ae: IBT-149 (BaseQuantity) and IBT-148 (BaseAmount) always mandatory','When no discount: set BaseAmount = PriceAmount, DiscountAmount = 0','aligned-ibrp-004: PriceAmount = BaseAmount − DiscountAmount when discount present']},
+
+  {cat:'neg', valid:false,
+   title:'TaxPointDate on a credit note — INVALID',
+   tags:['neg'],
+   desc:'TaxPointDate (IBT-007) must NOT appear on any credit note (381, 261, 81). It is only valid on invoice-type documents (380, 389, 480).',
+   rules:['ibr-125-ae'],
+   conditions:['ibr-125-ae: IBT-007 not allowed on doc types 381, 261, 81','Fatal error if present on credit notes','On invoices: IBT-007 must be before or equal to IssueDate']},
+
+  {cat:'neg', valid:false,
+   title:'S rate ≠ 5% — INVALID',
+   tags:['neg'],
+   desc:'Every S-category VAT rate must equal exactly 5.00. Any other value — including 0, 4, 10 — is a fatal violation anywhere the rate appears.',
+   rules:['ibr-190-ae'],
+   conditions:['ibr-190-ae checks all S-category Percent values across lines, allowances, charges, and TaxSubtotal','Rate must castable-as-decimal and equal exactly 5.00','Applies to ClassifiedTaxCategory, AllowanceCharge/TaxCategory, and TaxSubtotal/TaxCategory']},
+
+  {cat:'neg', valid:false,
+   title:'N on a document-level allowance or charge — INVALID',
+   tags:['neg'],
+   desc:'Margin scheme VAT code N is only permitted on invoice lines (ClassifiedTaxCategory). It cannot be used on document-level allowances or document-level charges.',
+   rules:['ibr-114-ae','ibr-115-ae'],
+   conditions:['ibr-114-ae: N not allowed on AllowanceCharge[ChargeIndicator=false] at doc level','ibr-115-ae: N not allowed on AllowanceCharge[ChargeIndicator=true] at doc level','N is only valid inside cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory']},
+
+  {cat:'neg', valid:false,
+   title:'IBT-110 and IBT-111 have opposite signs — INVALID',
+   tags:['neg'],
+   desc:'Total VAT in doc currency (IBT-110) and total VAT in AED (IBT-111) must share the same sign. On a credit note both are negative; on an invoice both are positive.',
+   rules:['ibr-084'],
+   conditions:['ibr-084: sign(IBT-110) must equal sign(IBT-111)','On credit notes all monetary totals including VAT are negative','Providing a positive IBT-111 alongside a negative IBT-110 = fatal']},
+
+  {cat:'neg', valid:false,
+   title:'Amount currencyID mismatch — INVALID',
+   tags:['neg'],
+   desc:'Every monetary amount attribute (currencyID) must equal the DocumentCurrencyCode, except for the second TaxTotal block which uses TaxCurrencyCode (AED).',
+   rules:['ibr-126'],
+   conditions:['ibr-126: all cbc:Amount/@currencyID must equal DocumentCurrencyCode','Exception: second TaxTotal amounts use TaxCurrencyCode (AED)','BTAE-08 and BTAE-10 are always AED — they sit inside ItemPriceExtension where the ibr-126 exemption applies (ibr-126 updated in v1.0.4)','Mixing currencies on LegalMonetaryTotal or InvoiceLine amounts = fatal']},
+];
+
+let activeCat = 'all';
+
+function buildEdgeFilters() {
+  const counts = {
+    all: EDGE_DATA.length,
+    multi: EDGE_DATA.filter(s=>s.cat==='multi').length,
+    currency: EDGE_DATA.filter(s=>s.cat==='currency').length,
+    calc: EDGE_DATA.filter(s=>s.cat==='calc').length,
+    edge: EDGE_DATA.filter(s=>s.cat==='edge').length,
+    neg: EDGE_DATA.filter(s=>!s.valid).length,
+  };
+  document.getElementById('edgeFilters').innerHTML = EDGE_CATS.map(c => {
+    const isActive = activeCat === c.id;
+    const activeCls = isActive ? (c.cls || 'active-all') : '';
+    return `<button class="chip ${activeCls}" onclick="setEdgeCat('${c.id}')">${c.label}<span class="chip-badge">${counts[c.id]}</span></button>`;
+  }).join('');
+}
+
+function renderEdge() {
+  const filtered = activeCat === 'all'
+    ? EDGE_DATA
+    : activeCat === 'neg'
+      ? EDGE_DATA.filter(s => !s.valid)
+      : EDGE_DATA.filter(s => s.cat === activeCat);
+
+  document.getElementById('edgeCount').innerHTML = `Showing <b>${filtered.length}</b> of <b>${EDGE_DATA.length}</b> scenarios`;
+
+  document.getElementById('edgeList').innerHTML = filtered.map(s => {
+    const tagHtml = s.tags.map(t => `<span class="sc-tag t-${t}">${t}</span>`).join('');
+    const ruleHtml = s.rules.map(r => `<span class="rule-badge">${r}</span>`).join('');
+    const condHtml = s.conditions.map(c => `<li>${c}</li>`).join('');
+    return `<div class="scenario">
+      <div class="sc-head">
+        <div class="sc-title">${s.title}</div>
+        <div class="sc-tags">${tagHtml}</div>
+      </div>
+      <span class="sc-verdict ${s.valid ? 'v-valid' : 'v-invalid'}">${s.valid ? '✓ Valid scenario' : '✕ Invalid — fatal error'}</span>
+      <div class="sc-desc">${s.desc}</div>
+      <div class="sc-rules">${ruleHtml}</div>
+      <div class="sc-divider"></div>
+      <div class="sc-conditions"><ul style="padding-left:16px;margin:0">${condHtml}</ul></div>
+    </div>`;
+  }).join('');
+}
+
+function setEdgeCat(id) {
+  activeCat = id;
+  buildEdgeFilters();
+  renderEdge();
+}
+
+buildEdgeFilters();
+renderEdge();
+</script>
+</body>
+</html>

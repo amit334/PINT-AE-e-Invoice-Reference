@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CreditNote xmlns="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2">
+	<cbc:CustomizationID>urn:peppol:pint:billing-1@ae-1</cbc:CustomizationID>
+	<cbc:ProfileID>urn:peppol:bis:billing</cbc:ProfileID>
+	<cbc:ProfileExecutionID>01000000</cbc:ProfileExecutionID>
+	<cbc:ID>cn_deemed_supply</cbc:ID>
+	<cbc:UUID>933299ab-0180-4fb5-9777-ba8dfe318b1d</cbc:UUID>
+	<cbc:IssueDate>2024-08-15</cbc:IssueDate>
+	<cbc:CreditNoteTypeCode name="01000000">381</cbc:CreditNoteTypeCode>
+	<cbc:Note>Deemed supply invoice — Laptop permanently gifted to employee Ahmed Khalid Al Mansouri (Staff ID: EMP-2024-0142). UAE VAT Art. 7(1)(b) deemed supply applies as input VAT was recovered on original purchase. Company accounts for output VAT at open market value AED 5,500. VAT of AED 275 borne by the company.</cbc:Note>
+	<cbc:DocumentCurrencyCode>AED</cbc:DocumentCurrencyCode>
+	<cbc:BuyerReference>EMP-2024-0142</cbc:BuyerReference>
+	<cac:DiscrepancyResponse>
+		<cbc:ResponseCode>DL8.61.1.A</cbc:ResponseCode>
+	</cac:DiscrepancyResponse>
+	<cac:BillingReference>
+		<cac:InvoiceDocumentReference>
+			<cbc:ID>DS-INV-2024-001</cbc:ID>
+			<cbc:IssueDate>2024-08-15</cbc:IssueDate>
+		</cac:InvoiceDocumentReference>
+	</cac:BillingReference>
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>PO-IT-2024-0089</cbc:ID>
+		<cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+	</cac:AdditionalDocumentReference>
+	<cac:AdditionalDocumentReference>
+		<cbc:ID>HR-GIFT-APPROVAL-2024-0142</cbc:ID>
+		<cbc:DocumentDescription>HR approval for permanent laptop gift to employee — approved by HR Director 2024-08-12</cbc:DocumentDescription>
+	</cac:AdditionalDocumentReference>
+	<cac:AccountingSupplierParty>
+		<cac:Party>
+			<cbc:EndpointID schemeID="0235">1000232325</cbc:EndpointID>
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">100112233400003</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<cbc:Name>Al Mashriq Heavy Industries LLC</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>Al Quoz Industrial Area 3, Street 8, Unit 14</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<cac:PartyTaxScheme>
+				<cbc:CompanyID>100112233400003</cbc:CompanyID>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<cbc:RegistrationName>Al Mashriq Heavy Industries LLC</cbc:RegistrationName>
+				<cbc:CompanyID schemeID="0234" schemeAgencyID="TL" schemeAgencyName="Dubai Department of Economic Development">TL-DXB-2024-112233</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Mohammed Al Rashidi</cbc:Name>
+				<cbc:Telephone>+971-4-321-9900</cbc:Telephone>
+				<cbc:ElectronicMail>finance@almashriq-industries.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingSupplierParty>
+	<cac:AccountingCustomerParty>
+		<cac:Party>
+			<cbc:EndpointID schemeID="0235">9900000097</cbc:EndpointID>
+			<cac:PartyIdentification>
+				<cbc:ID schemeID="0234">784199012345678</cbc:ID>
+			</cac:PartyIdentification>
+			<cac:PartyName>
+				<cbc:Name>Ahmed Khalid Al Mansouri</cbc:Name>
+			</cac:PartyName>
+			<cac:PostalAddress>
+				<cbc:StreetName>Al Barsha South 3, Villa 12</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:PostalAddress>
+			<cac:PartyTaxScheme>
+				<cbc:CompanyID>134567890123003</cbc:CompanyID>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:PartyTaxScheme>
+			<cac:PartyLegalEntity>
+				<cbc:RegistrationName>Ahmed Khalid Al Mansouri</cbc:RegistrationName>
+				<cbc:CompanyID schemeAgencyID="EID" schemeAgencyName="UAE Federal Authority for Identity and Citizenship">784199012345678</cbc:CompanyID>
+			</cac:PartyLegalEntity>
+			<cac:Contact>
+				<cbc:Name>Ahmed Khalid Al Mansouri</cbc:Name>
+				<cbc:ElectronicMail>ahmed.almansouri@almashriq-industries.ae</cbc:ElectronicMail>
+			</cac:Contact>
+		</cac:Party>
+	</cac:AccountingCustomerParty>
+	<cac:BuyerCustomerParty>
+		<cac:Party>
+			<cac:PartyIdentification>
+				<cbc:ID>EMP-2024-0142</cbc:ID>
+			</cac:PartyIdentification>
+		</cac:Party>
+	</cac:BuyerCustomerParty>
+	<cac:Delivery>
+		<cbc:ActualDeliveryDate>2024-08-15</cbc:ActualDeliveryDate>
+		<cac:DeliveryLocation>
+			<cac:Address>
+				<cbc:StreetName>Al Quoz Industrial Area 3, Street 8, Unit 14</cbc:StreetName>
+				<cbc:CityName>Dubai</cbc:CityName>
+				<cbc:PostalZone>00000</cbc:PostalZone>
+				<cbc:CountrySubentity>Dubai</cbc:CountrySubentity>
+				<cac:Country>
+					<cbc:IdentificationCode>AE</cbc:IdentificationCode>
+				</cac:Country>
+			</cac:Address>
+		</cac:DeliveryLocation>
+	</cac:Delivery>
+	<cac:PaymentTerms>
+		<cbc:Note>Deemed supply — no payment required from employee. VAT of AED 275.00 borne by Al Mashriq Heavy Industries LLC as the deemed supplier per UAE VAT Law Art. 7(1)(b).</cbc:Note>
+	</cac:PaymentTerms>
+	<cac:TaxTotal>
+		<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+		<cac:TaxSubtotal>
+			<cbc:TaxableAmount currencyID="AED">5500.00</cbc:TaxableAmount>
+			<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+			<cac:TaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:TaxCategory>
+		</cac:TaxSubtotal>
+	</cac:TaxTotal>
+	<cac:LegalMonetaryTotal>
+		<cbc:LineExtensionAmount currencyID="AED">5500.00</cbc:LineExtensionAmount>
+		<cbc:TaxExclusiveAmount currencyID="AED">5500.00</cbc:TaxExclusiveAmount>
+		<cbc:TaxInclusiveAmount currencyID="AED">5775.00</cbc:TaxInclusiveAmount>
+		<cbc:AllowanceTotalAmount currencyID="AED">0.00</cbc:AllowanceTotalAmount>
+		<cbc:ChargeTotalAmount currencyID="AED">0.00</cbc:ChargeTotalAmount>
+		<cbc:PayableAmount currencyID="AED">5775.00</cbc:PayableAmount>
+	</cac:LegalMonetaryTotal>
+	<cac:CreditNoteLine>
+		<cbc:ID>1</cbc:ID>
+		<cbc:CreditedQuantity unitCode="EA">1.0</cbc:CreditedQuantity>
+		<cbc:LineExtensionAmount currencyID="AED">5500.00</cbc:LineExtensionAmount>
+		<cac:Item>
+			<cbc:Description>Laptop computer — Dell Latitude 5540, Intel Core i7, 16GB RAM, 512GB SSD, permanently gifted to employee Ahmed Khalid Al Mansouri (Staff ID: EMP-2024-0142). Original purchase date: 2024-01-10. Input VAT recovered on original purchase. Deemed supply per UAE VAT Art. 7(1)(b). Open market value used as VAT base.</cbc:Description>
+			<cbc:Name>Laptop — Deemed Supply to Employee (Gift)</cbc:Name>
+			<cac:StandardItemIdentification>
+				<cbc:ID schemeID="0160">DELL-LAT-5540-2024</cbc:ID>
+			</cac:StandardItemIdentification>
+			<cac:CommodityClassification>
+				<cbc:ItemClassificationCode listID="HS">847130</cbc:ItemClassificationCode>
+			</cac:CommodityClassification>
+			<cac:ClassifiedTaxCategory>
+				<cbc:ID>S</cbc:ID>
+				<cbc:Percent>5.00</cbc:Percent>
+				<cac:TaxScheme>
+					<cbc:ID>VAT</cbc:ID>
+				</cac:TaxScheme>
+			</cac:ClassifiedTaxCategory>
+		</cac:Item>
+		<cac:Price>
+			<cbc:PriceAmount currencyID="AED">5500.0</cbc:PriceAmount>
+			<cbc:BaseQuantity unitCode="EA">1.0</cbc:BaseQuantity>
+			<cac:AllowanceCharge>
+				<cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+				<cbc:Amount currencyID="AED">0.0</cbc:Amount>
+				<cbc:BaseAmount currencyID="AED">5500.0</cbc:BaseAmount>
+			</cac:AllowanceCharge>
+		</cac:Price>
+		<cac:ItemPriceExtension>
+			<cbc:Amount currencyID="AED">5775.00</cbc:Amount>
+			<cac:TaxTotal>
+				<cbc:TaxAmount currencyID="AED">275.00</cbc:TaxAmount>
+			</cac:TaxTotal>
+		</cac:ItemPriceExtension>
+	</cac:CreditNoteLine>
+</CreditNote>

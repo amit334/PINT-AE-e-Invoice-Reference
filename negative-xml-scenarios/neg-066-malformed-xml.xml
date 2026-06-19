@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NEG-066: Intentionally malformed XML — unclosed tags and broken structure -->
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2">
+  <cbc:ID>INV-MALFORMED
+  <cbc:IssueDate>2025-06-01</cbc:IssueDate>
+  <cbc:InvoiceTypeCode>380
+  <UNCLOSED

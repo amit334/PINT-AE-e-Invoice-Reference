@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PINT AE — Invoice Type vs VAT Category Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14; --surface: #161920; --surface2: #1e2230;
+  --border: #2a2f3d; --border2: #363c50;
+  --text: #e8ecf4; --text2: #8892a8; --text3: #545e74;
+  --accent: #4e9cf5; --green: #3ecf8e; --amber: #f5a623; --red: #f55a5a;
+  --purple: #a78bfa; --teal: #2dd4bf;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; min-height: 100vh; }
+
+.topbar { padding: 1rem 2rem; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); text-decoration: none; padding: 5px 10px; border: 1px solid var(--border2); border-radius: 5px; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+.back-btn:hover { color: var(--text); border-color: var(--accent); }
+.page-title { font-size: 15px; font-weight: 600; }
+.page-sub { font-size: 11px; color: var(--text2); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+
+.content { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+
+.matrix-wrap { padding: 0; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+thead th { font-weight: 500; font-size: 11px; color: var(--text2); text-align: center; padding: 10px 6px 12px; border-bottom: 1px solid var(--border2); vertical-align: bottom; line-height: 1.3; background: var(--surface); }
+thead th.left { text-align: left; }
+tbody tr { border-bottom: 0.5px solid var(--border); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface); }
+td { padding: 10px 6px; vertical-align: middle; text-align: center; }
+td.label { text-align: left; padding-left: 0; }
+
+.code { display: inline-block; font-weight: 500; font-size: 12px; padding: 2px 8px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; }
+.code-s  { background: rgba(78,156,245,0.15); color: #4e9cf5; border: 1px solid rgba(78,156,245,0.3); }
+.code-ae { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+.code-z  { background: rgba(62,207,142,0.15); color: #3ecf8e; border: 1px solid rgba(62,207,142,0.3); }
+.code-e  { background: rgba(244,114,182,0.15); color: #f472b6; border: 1px solid rgba(244,114,182,0.3); }
+.code-o  { background: rgba(136,135,128,0.15); color: #888780; border: 1px solid rgba(136,135,128,0.3); }
+.code-n  { background: rgba(167,139,250,0.15); color: #a78bfa; border: 1px solid rgba(167,139,250,0.3); }
+
+.tick { color: #3ecf8e; font-size: 18px; line-height: 1; }
+.cross { color: var(--text3); font-size: 16px; }
+.required { color: var(--accent); font-size: 10px; font-weight: 500; font-family: 'IBM Plex Mono', monospace; display: block; margin-top: 2px; }
+
+.vat-name { font-weight: 500; color: var(--text); display: block; font-size: 13px; }
+.vat-desc { font-size: 11px; color: var(--text2); display: block; margin-top: 2px; line-height: 1.4; }
+.section-head td { background: var(--surface2); font-weight: 500; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 7px 6px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border); }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); }
+
+.exemption-block { margin-top: 28px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; }
+.exemption-title { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.exemption-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.exemption-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 6px 12px; font-size: 12px; color: var(--text); }
+.exemption-item span { color: var(--text2); margin-right: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+
+.rules-block { margin-top: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem 1.5rem; }
+.rules-title { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.rule-item { display: flex; gap: 10px; margin-bottom: 8px; font-size: 12px; line-height: 1.5; }
+.rule-item:last-child { margin-bottom: 0; }
+.rule-id { font-family: 'IBM Plex Mono', monospace; color: var(--amber); font-size: 11px; flex-shrink: 0; min-width: 100px; padding-top: 1px; }
+.rule-desc { color: var(--text2); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn">← Back</a>
+    <div>
+      <div class="page-title">Invoice Type vs VAT Category Matrix</div>
+      <div class="page-sub">PINT AE Billing & Self-Billing — all 6 document types × 6 VAT codes</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="matrix-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="left" style="width:24%">VAT Category</th>
+          <th style="width:13%">380<br>Tax Invoice</th>
+          <th style="width:13%">381<br>Tax Credit Note</th>
+          <th style="width:13%">389<br>Self-Billing Invoice</th>
+          <th style="width:13%">261<br>Self-Billing Credit Note</th>
+          <th style="width:12%">480<br>Invoice (Out of Scope)</th>
+          <th style="width:12%">81<br>Credit Note (Out of Scope)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-head"><td class="left" colspan="7">VAT-applicable categories</td></tr>
+        <tr>
+          <td class="label">
+            <span class="code code-s">S</span>
+            <span class="vat-name" style="margin-top:6px">Standard rate</span>
+            <span class="vat-desc">5% VAT · BTAE-08 & BTAE-10 per line mandatory</span>
+          </td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="cross">✕</span></td>
+          <td><span class="cross">✕</span></td>
+        </tr>
+        <tr>
+          <td class="label">
+            <span class="code code-ae">AE</span>
+            <span class="vat-name" style="margin-top:6px">VAT Reverse Charge</span>
+            <span class="vat-desc">Tax amount = 0 · Buyer VAT TRN (IBT-048) mandatory</span>
+          </td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="cross">✕</span></td>
+          <td><span class="cross">✕</span></td>
+        </tr>
+        <tr>
+          <td class="label">
+            <span class="code code-z">Z</span>
+            <span class="vat-name" style="margin-top:6px">Zero rated</span>
+            <span class="vat-desc">Rate must be explicitly 0</span>
+          </td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span><span class="required">required*</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+        </tr>
+        <tr class="section-head"><td class="left" colspan="7">Non-VAT / exempt categories</td></tr>
+        <tr>
+          <td class="label">
+            <span class="code code-e">E</span>
+            <span class="vat-name" style="margin-top:6px">Exempt from tax</span>
+            <span class="vat-desc">Exemption reason code mandatory · VAT rate not provided</span>
+          </td>
+          <td><span class="cross">✕</span><span class="required" style="color:var(--text3)">380/381 only*</span></td>
+          <td><span class="cross">✕</span><span class="required" style="color:var(--text3)">380/381 only*</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+        </tr>
+        <tr>
+          <td class="label">
+            <span class="code code-o">O</span>
+            <span class="vat-name" style="margin-top:6px">Not subject to VAT</span>
+            <span class="vat-desc">Outside scope · VAT rate not provided</span>
+          </td>
+          <td><span class="cross">✕</span><span class="required" style="color:var(--text3)">380/381 only*</span></td>
+          <td><span class="cross">✕</span><span class="required" style="color:var(--text3)">380/381 only*</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+          <td><span class="tick">✓</span></td>
+        </tr>
+        <tr class="section-head"><td class="left" colspan="7">Special transaction category</td></tr>
+        <tr>
+          <td class="label">
+            <span class="code code-n">N</span>
+            <span class="vat-name" style="margin-top:6px">Standard Rate Additional VAT</span>
+            <span class="vat-desc">Margin scheme only (BTAE-02 = XX1XXXXX) · tax amount = 0 · rate > 0 · not on doc-level allowances/charges</span>
+          </td>
+          <td><span class="tick">✓</span><span class="required">margin only</span></td>
+          <td><span class="tick">✓</span><span class="required">margin only</span></td>
+          <td><span class="tick">✓</span><span class="required">margin only</span></td>
+          <td><span class="tick">✓</span><span class="required">margin only</span></td>
+          <td><span class="cross">✕</span></td>
+          <td><span class="cross">✕</span></td>
+        </tr>
+        <tr class="section-head"><td class="left" colspan="7" style="color:var(--amber)">* ibr-151-ae — 380 and 381 must have at least one line with a VAT category other than E or O</td></tr>
+      </tbody>
+    </table>
+
+    <div class="legend">
+      <div class="legend-item"><span style="color:#3ecf8e;font-size:16px">✓</span> Allowed</div>
+      <div class="legend-item"><span style="color:var(--text3);font-size:14px">✕</span> Not permitted</div>
+      <div class="legend-item"><span style="font-size:11px;font-family:IBM Plex Mono,monospace;color:var(--accent)">required*</span> At least one line must carry S, AE, Z, or N for types 380/381</div>
+    </div>
+
+    <div class="exemption-block">
+      <div class="exemption-title">Exemption reason codes — required when VAT = E (ibr-120-ae)</div>
+      <div class="exemption-grid">
+        <div class="exemption-item"><span>DL8.46.1</span>Certain financial services</div>
+        <div class="exemption-item"><span>DL8.46.2</span>Residential units (lease or sale)</div>
+        <div class="exemption-item"><span>DL8.46.3</span>Bare land</div>
+        <div class="exemption-item"><span>DL8.46.4</span>Local passenger transport</div>
+      </div>
+    </div>
+
+    <div class="rules-block">
+      <div class="rules-title">Key schematron rules governing this matrix</div>
+      <div class="rule-item"><span class="rule-id">ibr-122-ae</span><span class="rule-desc">Doc types 480 and 81 must only use E, O, or Z. S, AE, and N are forbidden.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-151-ae</span><span class="rule-desc">Doc types 380 and 381 must have at least one line with a VAT category other than E or O.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-116-ae</span><span class="rule-desc">When BTAE-02 = XX1XXXXX (Margin Scheme), only VAT code N is allowed on the entire invoice.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-103-ae</span><span class="rule-desc">When VAT = AE (Reverse Charge), Buyer VAT identifier IBT-048 must be provided.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-114/115-ae</span><span class="rule-desc">VAT code N is not allowed on document-level allowances or charges — only on invoice lines.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-120-ae</span><span class="rule-desc">For VAT = Z, the VAT rate must be explicitly set to 0.</span></div>
+      <div class="rule-item"><span class="rule-id">ibr-121-ae</span><span class="rule-desc">For VAT = E, VAT rate must NOT be provided in the tax breakdown.</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
